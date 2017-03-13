@@ -8,20 +8,16 @@
 #ifndef SRC_RULE_H_
 #define SRC_RULE_H_
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
+
+template<class T>
 struct Rule
 {
-	bool *(condition)();
-	void *(body)();
-	void *(flush)();
+	bool (T::*condition)();
+	void (T::*body)();
+	void (T::*flush)();
 } ;
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* SRC_RULE_H_ */

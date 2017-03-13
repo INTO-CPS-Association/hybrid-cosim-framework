@@ -18,8 +18,9 @@ endif()
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFMI_COSIMULATION -O0 -g")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFMI_COSIMULATION -O0 -g")
 
+include_directories(third_party/fmi/include src)
 
-
+add_definitions(-DFMI_COSIMULATION)
 
 file(GLOB C_FILES src/*.c) # ../includes/templates/*.c)
 file(GLOB CPP_FILES src/*.cpp)
