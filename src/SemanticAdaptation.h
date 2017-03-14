@@ -11,20 +11,19 @@
 #include <iostream>
 #include <list>
 #include "Rule.h"
+#include "Fmu.h"
 using namespace std;
+using namespace fmi2;
 namespace adaptation
 {
 
-//FIXME: temp replace with full version
-class Fmu
-{
-};
+
 
 template<class T>
 class SemanticAdaptation
 {
 public:
-	SemanticAdaptation(shared_ptr<std::list<Rule<T>>>inRules, shared_ptr<std::list<Rule<T>>> outRules);
+	SemanticAdaptation(shared_ptr<std::string> resourceLocation,shared_ptr<std::list<Rule<T>>>inRules, shared_ptr<std::list<Rule<T>>> outRules);
 	virtual ~SemanticAdaptation();
 
 	void executeControlFlow(double h, double dt);
@@ -55,6 +54,8 @@ protected:
 	int getValueInteger(shared_ptr<Fmu>,int id );
 	bool getValueBoolean(shared_ptr<Fmu>,int id );
 	double getValueDouble(shared_ptr<Fmu>,int id );
+
+	shared_ptr<std::string> resourceLocation;
 private:
 	shared_ptr<std::list<Rule<T>>> inRules;
 	shared_ptr<std::list<Rule<T>>> outRules;

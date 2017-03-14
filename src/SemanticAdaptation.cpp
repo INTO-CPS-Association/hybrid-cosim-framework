@@ -11,8 +11,9 @@ namespace adaptation
 {
 
 template<class T>
-SemanticAdaptation<T>::SemanticAdaptation(shared_ptr<std::list<Rule<T>>>inRules, shared_ptr<std::list<Rule<T>>> outRules)
+SemanticAdaptation<T>::SemanticAdaptation(shared_ptr<std::string> resourceLocation,shared_ptr<std::list<Rule<T>>>inRules, shared_ptr<std::list<Rule<T>>> outRules)
 {
+	this->resourceLocation = resourceLocation;
 	this->machineType = Mealy;
 	this->inRules = inRules;
 	this->outRules = outRules;

@@ -18,6 +18,15 @@ endif()
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFMI_COSIMULATION -O0 -g")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFMI_COSIMULATION -O0 -g")
 
+
+add_subdirectory (third_party/stability-test)
+
+#get_cmake_property(_variableNames VARIABLES)
+#foreach (_variableName ${_variableNames})
+#    message(STATUS "${_variableName}=${${_variableName}}")
+#endforeach()
+
+
 include_directories(third_party/fmi/include src)
 
 add_definitions(-DFMI_COSIMULATION)
@@ -33,7 +42,7 @@ file(GLOB CPP_FILES src/*.cpp)
 
 add_library(${PROJECT_NAME} ${C_FILES} ${CPP_FILES})
 
-#target_link_libraries(${PROJECT_NAME} libshmfmi)
+target_link_libraries(${PROJECT_NAME} fmu)
 #target_link_libraries(${PROJECT_NAME} ${libshmfmi_LIBS})
 
 

@@ -19,12 +19,14 @@
 #include "SemanticAdaptation.h"
 #include "WindowSA.h"
 
+#include "uri.h"
+
 using namespace std;
 
 const fmi2CallbackFunctions *g_functions;
 std::string* name;
 
-shared_ptr<adaptation::SemanticAdaptation<adaptation::Window_SA>> g_adaptation;
+shared_ptr<adaptation::Window_SA> g_adaptation;
 
 template<class T>
 static void log(const fmi2CallbackFunctions *functions, fmi2ComponentEnvironment componentEnvironment,
@@ -65,6 +67,8 @@ extern "C" fmi2Component fmi2Instantiate(fmi2String instanceName, fmi2Type fmuTy
 	name = new std::string(instanceName);
 	g_functions = functions;
 	fmiprintf("instantiating rollback-test %s\n", "");
+	auto resourceLoc = make_shared<std::string>(fmuResourceLocation);
+	g_adaptation = make_shared<adaptation::Window_SA>(resourceLoc);
 	return (void*) 2;
 }
 

@@ -1,3 +1,6 @@
 [submodule "third_party/fmi"]
 	path = third_party/fmi
 	url = https://github.com/into-cps/fmi.git
+[submodule "third_party/stability-test"]
+	path = third_party/stability-test
+	url = git@gitlab.au.dk:into-cps/stability-test.git

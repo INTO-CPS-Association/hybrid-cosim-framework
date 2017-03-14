@@ -211,14 +211,14 @@ shared_ptr<std::list<Rule<Window_SA>>>Window_SA::createOutputRules()
 	return list;
 }
 
-Window_SA::Window_SA() :
-		SemanticAdaptation(createInputRules(), createOutputRules())
+Window_SA::Window_SA(shared_ptr<std::string> resourceLocation) :
+		SemanticAdaptation(resourceLocation, createInputRules(), createOutputRules())
 {
 	reaction_force = displacement = speed = disp = tau = stored_windowsa_reaction_force = stored_windowsa_displacement =
 			stored_windowsa_speed = stored_window_reaction_torque = stored_window_height = 0;
 
-	//FIXME
-//	this->window =
+	const char* path = Fmu::combinePath(resourceLocation, make_shared<string>("window.fmu"))->c_str();
+	this->window = make_shared<fmi2::Fmu>(path);
 }
 
 Window_SA::~Window_SA()

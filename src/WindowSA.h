@@ -12,14 +12,15 @@
 #include "SemanticAdaptation.h"
 
 using namespace std;
+using namespace fmi2;
 
 namespace adaptation
 {
 
-class Window_SA: SemanticAdaptation<Window_SA>
+class Window_SA: public SemanticAdaptation<Window_SA>
 {
 public:
-	Window_SA();
+	Window_SA(shared_ptr<std::string> resourceLocation);
 	virtual ~Window_SA();
 
 	void setFmiValue(int id, int value);
