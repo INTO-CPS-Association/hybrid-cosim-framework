@@ -31,27 +31,29 @@ public:
 	enum MooreOrMealy
 	{	Moore,Mealy};
 
-	virtual void setFmiValue(int id , int value)=0;
-	virtual void setFmiValue(int id , bool value)=0;
-	virtual void setFmiValue(int id , double value)=0;
+	virtual void setFmiValue(fmi2ValueReference id , int value)=0;
+	virtual void setFmiValue(fmi2ValueReference id , bool value)=0;
+	virtual void setFmiValue(fmi2ValueReference id , double value)=0;
 
-	virtual int getFmiValueInteger(int id )=0;
-	virtual bool getFmiValueBoolean(int id )=0;
-	virtual double getFmiValueDouble(int id )=0;
+	virtual int getFmiValueInteger(fmi2ValueReference id )=0;
+	virtual bool getFmiValueBoolean(fmi2ValueReference id )=0;
+	virtual double getFmiValueDouble(fmi2ValueReference id )=0;
+
+	void flushAllEnabledOutRules();
 
 protected:
 	virtual void executeInternalControlFlow(double h, double dt)=0;
-	void do_step(shared_ptr<Fmu>,double t,double H);
+	void do_step(shared_ptr<FmuComponent>,double t,double H);
 
 	MooreOrMealy machineType;
 
-	void setValue(shared_ptr<Fmu>,int id , int value);
-	void setValue(shared_ptr<Fmu>,int id , bool value);
-	void setValue(shared_ptr<Fmu>,int id , double value);
+	void setValue(shared_ptr<FmuComponent>,fmi2ValueReference id , int value);
+	void setValue(shared_ptr<FmuComponent>,fmi2ValueReference id , bool value);
+	void setValue(shared_ptr<FmuComponent>,fmi2ValueReference id , double value);
 
-	int getValueInteger(shared_ptr<Fmu>,int id );
-	bool getValueBoolean(shared_ptr<Fmu>,int id );
-	double getValueDouble(shared_ptr<Fmu>,int id );
+	int getValueInteger(shared_ptr<FmuComponent>,fmi2ValueReference id );
+	bool getValueBoolean(shared_ptr<FmuComponent>,fmi2ValueReference id );
+	double getValueDouble(shared_ptr<FmuComponent>,fmi2ValueReference id );
 
 	virtual T* getRuleThis() =0;
 
@@ -62,6 +64,9 @@ private:
 
 	shared_ptr<std::list<Rule<T>>> enablesInRules;
 	shared_ptr<std::list<Rule<T>>> enablesOutRules;
+
+	void flushAllEnabledInRules();
+
 
 };
 
@@ -107,6 +112,12 @@ void SemanticAdaptation<T>::executeInRules()
 template<class T>
 void SemanticAdaptation<T>::executeOutRules()
 {
+	if(this->enablesOutRules->size() >0)
+	{
+		//not sure why
+		return;
+	}
+
 	for (auto itr = this->outRules->begin(), end = this->outRules->end(); itr != end; ++itr)
 	{
 		Rule<T> rule = *itr;
@@ -117,56 +128,156 @@ void SemanticAdaptation<T>::executeOutRules()
 			{
 				((*getRuleThis()).*rule.flush)();
 			}
-			this->enablesInRules->push_back(*itr);
+			this->enablesOutRules->push_back(*itr);
 		}
 	}
 }
+
+template<class T>
+void SemanticAdaptation<T>::flushAllEnabledInRules()
+{
+	for (auto itr = this->enablesInRules->begin(), end = this->enablesInRules->end(); itr != end; ++itr)
+	{
+		Rule<T> rule = *itr;
+		((*getRuleThis()).*rule.flush)();
+
+	}
+}
+
+template<class T>
+void SemanticAdaptation<T>::flushAllEnabledOutRules()
+{
+	for (auto itr = this->enablesOutRules->begin(), end = this->enablesOutRules->end(); itr != end; ++itr)
+	{
+		Rule<T> rule = *itr;
+		((*getRuleThis()).*rule.flush)();
+
+	}
+}
+
+
 
 template<class T>
 void SemanticAdaptation<T>::executeControlFlow(double h, double dt)
 {
 	this->enablesOutRules->clear();
 
+	//flush all enabled in-rules
+	flushAllEnabledInRules();
+
 	executeInternalControlFlow(h, dt);
+
+	//execute the body of all out-rules with a true condition and enable them
+	executeOutRules();
 
 	this->enablesInRules->clear();
 }
 
 template<class T>
-void SemanticAdaptation<T>::setValue(shared_ptr<Fmu>, int id, int value)
+void SemanticAdaptation<T>::setValue(shared_ptr<FmuComponent> fmuComp, fmi2ValueReference id, int value)
 {
+	const fmi2ValueReference vr[]
+	{ id };
+	size_t nvr = 1;
+	fmi2Integer v[]
+	{ value };
+
+	fmi2Status status = fmuComp->fmu->setInteger(fmuComp->component, vr, nvr, v);
+	if (status != fmi2OK)
+	{
+		cerr << "setInteger failed: " << id << " " << status << endl;
+	}
 }
 
 template<class T>
-void SemanticAdaptation<T>::setValue(shared_ptr<Fmu>, int id, bool value)
+void SemanticAdaptation<T>::setValue(shared_ptr<FmuComponent> fmuComp, fmi2ValueReference id, bool value)
 {
+	const fmi2ValueReference vr[]
+	{ id };
+	size_t nvr = 1;
+	fmi2Boolean v[]
+	{ value };
+
+	fmi2Status status = fmuComp->fmu->setBoolean(fmuComp->component, vr, nvr, v);
+	if (status != fmi2OK)
+	{
+		cerr << "setBoolean failed: " << id << " " << status << endl;
+	}
 }
 
 template<class T>
-void SemanticAdaptation<T>::setValue(shared_ptr<Fmu>, int id, double value)
+void SemanticAdaptation<T>::setValue(shared_ptr<FmuComponent> fmuComp, fmi2ValueReference id, double value)
 {
+	const fmi2ValueReference vr[]
+	{ id };
+	size_t nvr = 1;
+	fmi2Real v[]
+	{ value };
+
+	fmi2Status status = fmuComp->fmu->setReal(fmuComp->component, vr, nvr, v);
+	if (status != fmi2OK)
+	{
+		cerr << "setReal failed: " << id << " " << status << endl;
+	}
 }
 
 template<class T>
-void SemanticAdaptation<T>::do_step(shared_ptr<Fmu> fmu, double t, double H)
+void SemanticAdaptation<T>::do_step(shared_ptr<FmuComponent> fmuComp, double t, double H)
 {
-
+	fmi2Status status = fmuComp->fmu->doStep(fmuComp->component, t, H, false);
+	if (status != fmi2OK)
+	{
+		cerr << "do_step failed: t: " << t << " h: " << H << " " << status << endl;
+	}
 }
 
 template<class T>
-int SemanticAdaptation<T>::getValueInteger(shared_ptr<Fmu>, int id)
+int SemanticAdaptation<T>::getValueInteger(shared_ptr<FmuComponent> fmuComp, fmi2ValueReference id)
 {
-	return 0;
+	const fmi2ValueReference vr[]
+	{ id };
+	size_t nvr = 1;
+	fmi2Integer v[1];
+
+	fmi2Status status = fmuComp->fmu->getInteger(fmuComp->component, vr, nvr, v);
+	if (status != fmi2OK)
+	{
+		cerr << "getInteger failed: " << id << " " << status << endl;
+	}
+
+	return v[0];
 }
 template<class T>
-bool SemanticAdaptation<T>::getValueBoolean(shared_ptr<Fmu>, int id)
+bool SemanticAdaptation<T>::getValueBoolean(shared_ptr<FmuComponent> fmuComp, fmi2ValueReference id)
 {
-	return false;
+	const fmi2ValueReference vr[]
+	{ id };
+	size_t nvr = 1;
+	fmi2Boolean v[1];
+
+	fmi2Status status = fmuComp->fmu->getBoolean(fmuComp->component, vr, nvr, v);
+	if (status != fmi2OK)
+	{
+		cerr << "getBoolean failed: " << id << " " << status << endl;
+	}
+
+	return v[0];
 }
 template<class T>
-double SemanticAdaptation<T>::getValueDouble(shared_ptr<Fmu>, int id)
+double SemanticAdaptation<T>::getValueDouble(shared_ptr<FmuComponent> fmuComp, fmi2ValueReference id)
 {
-	return 0.0;
+	const fmi2ValueReference vr[]
+	{ id };
+	size_t nvr = 1;
+	fmi2Real v[1];
+
+	fmi2Status status = fmuComp->fmu->getReal(fmuComp->component, vr, nvr, v);
+	if (status != fmi2OK)
+	{
+		cerr << "getReal failed: " << id << " " << status << endl;
+	}
+
+	return v[0];
 }
 
 }

@@ -5,6 +5,7 @@
  *      Author: kel
  */
 #include <iostream>
+#include "fmi2TypesPlatform.h"
 #include "fmi2Functions.h"
 #include <string>
 
@@ -35,6 +36,27 @@ void fmuLoggerCache(void *componentEnvironment, fmi2String instanceName, fmi2Sta
 			<< completeMessage << endl;
 }
 
+void setReal(fmi2Component comp, fmi2ValueReference id, fmi2Real val)
+{
+	const fmi2ValueReference vr[]
+	{ id };
+	size_t nvr = 1;
+	fmi2Real value[]
+	{ val };
+	fmi2SetReal(comp, vr, nvr, value);
+}
+
+fmi2Real getReal(fmi2Component comp, fmi2ValueReference id)
+{
+	const fmi2ValueReference vr[]
+	{ id };
+	size_t nvr = 1;
+	fmi2Real value[1];
+	fmi2SetReal(comp, vr, nvr, value);
+
+	return value[0];
+}
+
 int main()
 {
 	cout << "hello" << endl;
@@ -50,12 +72,23 @@ int main()
 		return -1;
 	}
 
-	const fmi2ValueReference vr[]
-	{ 1 };
-	size_t nvr = 1;
-	fmi2Real value[]
-	{ 1.0 };
-	fmi2SetReal(comp, vr, nvr, value);
+#define ID_Window_SA_IN_reaction_force 0
+#define ID_Window_SA_IN_displacement 1
+#define ID_Window_SA_IN_speed 2
+
+#define ID_Window_SA_OUT_disp 3
+#define ID_Window_SA_OUT_tau 4
+
+	for (int i = 0; i < 20; i++)
+	{
+		setReal(comp, ID_Window_SA_IN_reaction_force, 1.0);
+		setReal(comp, ID_Window_SA_IN_displacement, 1.0);
+		setReal(comp, ID_Window_SA_IN_speed, 1.0);
+
+		fmi2DoStep(comp, 0, 1, false);
+
+		cout << "disp: " <<getReal(comp,ID_Window_SA_OUT_disp )<< " tau: "<<getReal(comp,ID_Window_SA_OUT_tau ) << endl;
+	}
 
 	return 0;
 }

@@ -132,36 +132,39 @@ extern "C" fmi2Status fmi2SetDebugLogging(fmi2Component c, fmi2Boolean loggingOn
 
 extern "C" fmi2Status fmi2GetReal(fmi2Component c, const fmi2ValueReference vr[], size_t nvr, fmi2Real value[])
 {
+	g_adaptation->executeOutRules();
+	g_adaptation->flushAllEnabledOutRules();
 	for (int i = 0; i < nvr; i++)
 		{
 			value[i] = g_adaptation->getFmiValueDouble(vr[i]);
 		}
 
-	g_adaptation->executeOutRules();
 	return fmi2OK;
 }
 
 extern "C" fmi2Status fmi2GetInteger(fmi2Component c, const fmi2ValueReference vr[], size_t nvr, fmi2Integer value[])
 {
 
+	g_adaptation->executeOutRules();
+	g_adaptation->flushAllEnabledOutRules();
 	for (int i = 0; i < nvr; i++)
 		{
 			value[i] = g_adaptation->getFmiValueInteger(vr[i]);
 		}
 
-	g_adaptation->executeOutRules();
 	return fmi2OK;
 }
 
 extern "C" fmi2Status fmi2GetBoolean(fmi2Component c, const fmi2ValueReference vr[], size_t nvr, fmi2Boolean value[])
 {
 
+	g_adaptation->executeOutRules();
+	g_adaptation->flushAllEnabledOutRules();
 	for (int i = 0; i < nvr; i++)
 	{
 		value[i] = g_adaptation->getFmiValueBoolean(vr[i]);
 	}
 
-	g_adaptation->executeOutRules();
 	return fmi2OK;
 }
 
@@ -169,6 +172,7 @@ extern "C" fmi2Status fmi2GetString(fmi2Component c, const fmi2ValueReference vr
 {
 
 	g_adaptation->executeOutRules();
+	g_adaptation->flushAllEnabledOutRules();
 	return fmi2OK;
 }
 
@@ -177,11 +181,11 @@ extern "C" fmi2Status fmi2SetReal(fmi2Component c, const fmi2ValueReference vr[]
 
 	for (int i = 0; i < nvr; i++)
 	{
-		g_functions->logger((void*) 2, name->c_str(), fmi2OK, "logAll", "setting real vr=%d, value: %f\n", vr[i], value[i]);
+//		g_functions->logger((void*) 2, name->c_str(), fmi2OK, "logAll", "setting real vr=%d, value: %f\n", vr[i], value[i]);
 		g_adaptation->setFmiValue(vr[i], value[i]);
 	}
 
-	g_functions->logger((void*) 2, name->c_str(), fmi2OK, "logAll", "setting real executing in rules");
+//	g_functions->logger((void*) 2, name->c_str(), fmi2OK, "logAll", "setting real executing in rules");
 	g_adaptation->executeInRules();
 	return fmi2OK;
 }
@@ -285,7 +289,7 @@ extern "C" fmi2Status fmi2CancelStep(fmi2Component c)
 extern "C" fmi2Status fmi2DoStep(fmi2Component c, fmi2Real currentCommunicationPoint, fmi2Real communicationStepSize,
 		fmi2Boolean noSetFMUStatePriorToCurrentPoint)
 {
-	fmiprintf("doStep%s\n", "");
+//	fmiprintf("doStep%s\n", "");
 
 	g_adaptation->executeControlFlow(currentCommunicationPoint, communicationStepSize);
 	return fmi2OK;

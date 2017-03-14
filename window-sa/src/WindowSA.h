@@ -18,19 +18,27 @@ using namespace fmi2;
 namespace adaptation
 {
 
+#define ID_Window_SA_IN_reaction_force 0
+#define ID_Window_SA_IN_displacement 1
+#define ID_Window_SA_IN_speed 2
+
+#define ID_Window_SA_OUT_disp 3
+#define ID_Window_SA_OUT_tau 4
+
+
 class Window_SA: public SemanticAdaptation<Window_SA>
 {
 public:
 	Window_SA(shared_ptr<std::string> resourceLocation);
 	virtual ~Window_SA();
 
-	void setFmiValue(int id, int value);
-	void setFmiValue(int id, bool value);
-	void setFmiValue(int id, double value);
+	void setFmiValue(fmi2ValueReference id, int value);
+	void setFmiValue(fmi2ValueReference id, bool value);
+	void setFmiValue(fmi2ValueReference id, double value);
 
-	int getFmiValueInteger(int id);
-	bool getFmiValueBoolean(int id);
-	double getFmiValueDouble(int id);
+	int getFmiValueInteger(fmi2ValueReference id);
+	bool getFmiValueBoolean(fmi2ValueReference id);
+	double getFmiValueDouble(fmi2ValueReference id);
 
 private:
 
@@ -63,7 +71,7 @@ Window_SA*	getRuleThis();
 
 	void executeInternalControlFlow(double h, double dt);
 
-	shared_ptr<Fmu> window;
+	shared_ptr<FmuComponent> window;
 
 	//inputs
 	double reaction_force;

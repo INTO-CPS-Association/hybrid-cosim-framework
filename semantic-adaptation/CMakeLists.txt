@@ -18,7 +18,12 @@ endif()
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFMI_COSIMULATION -O0 -g")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFMI_COSIMULATION -O0 -g")
 
-include_directories(../third_party/fmi/include src)
+
+
+#get_filename_component(FMI_INCLUDE_DIR "../third_party/fmi/include" ABSOLUTE)
+
+#include_directories(${FMI_INCLUDE_DIR} src)
+include_directories(src)
 
 add_definitions(-DFMI_COSIMULATION)
 
@@ -28,7 +33,7 @@ file(GLOB CPP_FILES src/*.cpp)
 add_library(${PROJECT_NAME} ${C_FILES} ${CPP_FILES})
 
 target_link_libraries(${PROJECT_NAME} fmu)
-target_include_directories(${PROJECT_NAME} PUBLIC ../third_party/fmi/include src/)
+target_include_directories(${PROJECT_NAME} PUBLIC src)
 
 set_target_properties(${PROJECT_NAME}
                       PROPERTIES POSITION_INDEPENDENT_CODE ON)

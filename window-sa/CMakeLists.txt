@@ -26,6 +26,8 @@ include_directories(src)
 file(GLOB CPP_FILES src/*.cpp)
 
 
+
+
 #add_library(${PROJECT_NAME} ${CPP_FILES} ../semantic-adaptation/src/SemanticAdaptation.cpp)
 
 #target_link_libraries(${PROJECT_NAME} fmu)
@@ -33,7 +35,7 @@ file(GLOB CPP_FILES src/*.cpp)
 
 add_executable(${PROJECT_NAME}_main ${CPP_FILES})
 target_link_libraries(${PROJECT_NAME}_main hcf)
-target_link_libraries(${PROJECT_NAME}_main fmu)
+#target_link_libraries(${PROJECT_NAME}_main fmu)
 
 foreach(LETTER ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES})
 	
