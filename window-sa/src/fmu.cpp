@@ -16,7 +16,7 @@
 
 #include "fmi2Functions.h"
 #include <string>
-#include "SemanticAdaptation.h"
+
 #include "WindowSA.h"
 
 #include "uri.h"
