@@ -10,6 +10,7 @@
 
 #include <memory>
 #include "SemanticAdaptation.h"
+#include "Fmu.h"
 
 using namespace std;
 using namespace fmi2;
@@ -33,7 +34,9 @@ public:
 
 private:
 
-	shared_ptr<std::list<Rule<Window_SA>>>createInputRules();
+Window_SA*	getRuleThis();
+
+	shared_ptr<std::list<Rule<Window_SA>>> createInputRules();
 	shared_ptr<std::list<Rule<Window_SA>>> createOutputRules();
 
 	/*in rules*/

@@ -18,42 +18,17 @@ endif()
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFMI_COSIMULATION -O0 -g")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFMI_COSIMULATION -O0 -g")
 
-
-
-
 include_directories(../third_party/fmi/include src)
 
 add_definitions(-DFMI_COSIMULATION)
 
-file(GLOB C_FILES src/*.c) # ../includes/templates/*.c)
+file(GLOB C_FILES src/*.c)
 file(GLOB CPP_FILES src/*.cpp)
 
 add_library(${PROJECT_NAME} ${C_FILES} ${CPP_FILES})
 
 target_link_libraries(${PROJECT_NAME} fmu)
 target_include_directories(${PROJECT_NAME} PUBLIC ../third_party/fmi/include src/)
-
-foreach(LETTER ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES})
-	
-if(EXISTS "${LETTER}/libstdc++.a")
-#   message (STATUS "${LETTER}")
-	set(STDCPP_LIBRARY "${LETTER}/libstdc++.a")
-else()
-#  message (STATUS "${LETTER} ---- not these")
-endif()
-endforeach()
-
-message(STATUS "Static linking with libstdc++.a in ${STDCPP_LIBRARY}")
-target_link_libraries(${PROJECT_NAME} ${STDCPP_LIBRARY})
-
-
-
-# I need this: -static-libgcc -static-libstdc++ -Wl,-Bstatic -lstdc++ -lpthread -Wl,-Bdynamic
-
-if (WIN32)
-	#windows	
-	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libstdc++ -static-libgcc")
-endif() 
 
 set_target_properties(${PROJECT_NAME}
                       PROPERTIES POSITION_INDEPENDENT_CODE ON)

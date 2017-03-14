@@ -74,11 +74,13 @@ double Window_SA::getFmiValueDouble(int id)
 
 bool Window_SA::in_rule_condition_1()
 {
+	cout << "executing in in_rule_condition_1"<<endl;
 	return true;
 }
 
 void Window_SA::in_rule_body1()
 {
+	cout << "executing in in_rule_body1"<<endl;
 //	is_set checks whether the input value is given in the setValues call of the adapted FMU.
 	//		Notice that in the canonical version, all ports are prefixed.
 	//		*/
@@ -87,6 +89,7 @@ void Window_SA::in_rule_body1()
 }
 void Window_SA::in_rule_flush1()
 {
+	cout << "executing in in_rule_flush1"<<endl;
 //window.reaction_force = stored_windowsa_reaction_force;
 	setValue(window, 1/*reaction_force*/, stored_windowsa_reaction_force);
 }
@@ -209,6 +212,11 @@ shared_ptr<std::list<Rule<Window_SA>>>Window_SA::createOutputRules()
 			{	&Window_SA::out_rule_condition_2, &Window_SA::out_rule_body2, &Window_SA::out_rule_flush2});
 
 	return list;
+}
+
+Window_SA* Window_SA::getRuleThis()
+{
+	return this;
 }
 
 Window_SA::Window_SA(shared_ptr<std::string> resourceLocation) :

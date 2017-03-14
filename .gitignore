@@ -27,3 +27,4 @@ CTestTestfile.cmake
 
 # executables
 fmu
+window-sa/window-sa_main

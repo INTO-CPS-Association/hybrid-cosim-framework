@@ -22,17 +22,18 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFMI_COSIMULATION -O0 -g")
 
 include_directories(src)
 
-add_definitions(-DFMI_COSIMULATION)
 
-file(GLOB C_FILES src/*.c) # ../includes/templates/*.c)
 file(GLOB CPP_FILES src/*.cpp)
 
 
-add_library(${PROJECT_NAME} ${C_FILES} ${CPP_FILES})
+#add_library(${PROJECT_NAME} ${CPP_FILES} ../semantic-adaptation/src/SemanticAdaptation.cpp)
 
-target_link_libraries(${PROJECT_NAME} fmu)
-target_link_libraries(${PROJECT_NAME} hcf)
+#target_link_libraries(${PROJECT_NAME} fmu)
+#target_link_libraries(${PROJECT_NAME} hcf)
 
+add_executable(${PROJECT_NAME}_main ${CPP_FILES})
+target_link_libraries(${PROJECT_NAME}_main hcf)
+target_link_libraries(${PROJECT_NAME}_main fmu)
 
 foreach(LETTER ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES})
 	
@@ -45,7 +46,7 @@ endif()
 endforeach()
 
 message(STATUS "Static linking with libstdc++.a in ${STDCPP_LIBRARY}")
-target_link_libraries(${PROJECT_NAME} ${STDCPP_LIBRARY})
+#target_link_libraries(${PROJECT_NAME} ${STDCPP_LIBRARY})
 
 
 

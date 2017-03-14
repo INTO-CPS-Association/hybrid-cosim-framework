@@ -57,6 +57,8 @@ static void fmiprintf(fmi2String message, T arg)
 	}
 }
 
+
+
 // ---------------------------------------------------------------------------
 // FMI functions
 // ---------------------------------------------------------------------------
@@ -66,7 +68,7 @@ extern "C" fmi2Component fmi2Instantiate(fmi2String instanceName, fmi2Type fmuTy
 {
 	name = new std::string(instanceName);
 	g_functions = functions;
-	fmiprintf("instantiating rollback-test %s\n", "");
+	fmiprintf("instantiating %s\n", instanceName);
 	auto resourceLoc = make_shared<std::string>(fmuResourceLocation);
 	g_adaptation = make_shared<adaptation::Window_SA>(resourceLoc);
 	return (void*) 2;
@@ -175,8 +177,11 @@ extern "C" fmi2Status fmi2SetReal(fmi2Component c, const fmi2ValueReference vr[]
 
 	for (int i = 0; i < nvr; i++)
 	{
+		g_functions->logger((void*) 2, name->c_str(), fmi2OK, "logAll", "setting real vr=%d, value: %f\n", vr[i], value[i]);
 		g_adaptation->setFmiValue(vr[i], value[i]);
 	}
+
+	g_functions->logger((void*) 2, name->c_str(), fmi2OK, "logAll", "setting real executing in rules");
 	g_adaptation->executeInRules();
 	return fmi2OK;
 }
