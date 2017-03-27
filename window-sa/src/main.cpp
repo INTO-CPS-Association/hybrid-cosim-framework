@@ -13,6 +13,8 @@
 #include <iostream>
 #include <string>
 #include <cstdio>
+#include <stdarg.h>     /* va_list, va_start, va_arg, va_end */
+
 using namespace std;
 
 void fmuLoggerCache(void *componentEnvironment, fmi2String instanceName, fmi2Status status, fmi2String category,
