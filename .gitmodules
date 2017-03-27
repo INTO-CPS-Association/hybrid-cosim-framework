@@ -4,3 +4,4 @@
 [submodule "third_party/stability-test"]
 	path = third_party/stability-test
 	url = git@gitlab.au.dk:into-cps/stability-test.git
+	ignore = dirty
