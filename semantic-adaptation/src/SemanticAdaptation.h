@@ -46,7 +46,7 @@ public:
 
 	virtual int getFmiValueInteger(fmi2ValueReference id )=0;
 	virtual bool getFmiValueBoolean(fmi2ValueReference id )=0;
-	virtual double getFmiValueDouble(fmi2ValueReference id )=0;
+	virtual double getFmiValueReal(fmi2ValueReference id )=0;
 
 	fmi2Status fmi2SetupExperiment(fmi2Boolean toleranceDefined, fmi2Real tolerance, fmi2Real startTime,
 	fmi2Boolean stopTimeDefined, fmi2Real stopTime);

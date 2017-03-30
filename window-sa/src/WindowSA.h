@@ -39,7 +39,7 @@ public:
 
 	int getFmiValueInteger(fmi2ValueReference id);
 	bool getFmiValueBoolean(fmi2ValueReference id);
-	double getFmiValueDouble(fmi2ValueReference id);
+	double getFmiValueReal(fmi2ValueReference id);
 
 private:
 

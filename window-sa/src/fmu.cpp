@@ -137,7 +137,7 @@ extern "C" fmi2Status fmi2GetReal(fmi2Component c,
 		return status;
 
 	for (int i = 0; i < nvr; i++) {
-		value[i] = g_adaptation->getFmiValueDouble(vr[i]);
+		value[i] = g_adaptation->getFmiValueReal(vr[i]);
 
 		status = g_adaptation->getLastErrorState();
 		if (status != fmi2OK)

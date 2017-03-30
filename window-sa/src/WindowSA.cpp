@@ -38,7 +38,7 @@ int Window_SA::getFmiValueInteger(fmi2ValueReference id) {
 bool Window_SA::getFmiValueBoolean(fmi2ValueReference id) {
 	return false;
 }
-double Window_SA::getFmiValueDouble(fmi2ValueReference id) {
+double Window_SA::getFmiValueReal(fmi2ValueReference id) {
 	switch (id) {
 	case ID_Window_SA_OUT_disp:
 		return this->disp;
