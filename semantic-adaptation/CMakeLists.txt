@@ -15,14 +15,6 @@ else()
         message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFMI_COSIMULATION -O0 -g")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFMI_COSIMULATION -O0 -g")
-
-
-
-#get_filename_component(FMI_INCLUDE_DIR "../third_party/fmi/include" ABSOLUTE)
-
-#include_directories(${FMI_INCLUDE_DIR} src)
 include_directories(src)
 
 add_definitions(-DFMI_COSIMULATION)

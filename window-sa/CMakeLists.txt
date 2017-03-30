@@ -3,7 +3,7 @@ project (window-sa C CXX)
 
 include(CheckCXXCompilerFlag)
 
-set(CMAKE_VERBOSE_MAKEFILE on)
+#set(CMAKE_VERBOSE_MAKEFILE on)
 
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
@@ -15,8 +15,8 @@ else()
         message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFMI_COSIMULATION -O0 -g")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFMI_COSIMULATION -O0 -g")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFMI_COSIMULATION -g")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFMI_COSIMULATION -g")
 
 
 
@@ -25,17 +25,20 @@ include_directories(src)
 
 file(GLOB CPP_FILES src/*.cpp)
 
+file(GLOB CPP_MAIN_FILES src/main*.cpp)
+
+list(REMOVE_ITEM CPP_FILES ${CPP_MAIN_FILES})
+
+## library ##
+
+add_library(${PROJECT_NAME} ${CPP_FILES} ${CPP_FILES})
+target_link_libraries(${PROJECT_NAME} hcf)
+set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 
-
-#add_library(${PROJECT_NAME} ${CPP_FILES} ../semantic-adaptation/src/SemanticAdaptation.cpp)
-
-#target_link_libraries(${PROJECT_NAME} fmu)
-#target_link_libraries(${PROJECT_NAME} hcf)
-
-add_executable(${PROJECT_NAME}_main ${CPP_FILES})
+## Main executable ##
+add_executable(${PROJECT_NAME}_main ${CPP_MAIN_FILES} ${CPP_FILES})
 target_link_libraries(${PROJECT_NAME}_main hcf)
-#target_link_libraries(${PROJECT_NAME}_main fmu)
 
 foreach(LETTER ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES})
 	
@@ -56,16 +59,25 @@ message(STATUS "Static linking with libstdc++.a in ${STDCPP_LIBRARY}")
 
 if (WIN32)
 	#windows	
-	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libstdc++ -static-libgcc")
+	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libstdc++ -static-libgcc -Wl,-Bstatic -lstdc++ -lpthread -Wl,-Bdynamic")
+ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++ -static-libgcc  -Wl,-Bstatic -lstdc++ -lpthread -Wl,-Bdynamic")
 endif() 
 
-#set_target_properties(${PROJECT_NAME}
-#                      PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 
 
-# Expose A's public includes (including the ones of A's dependencies
-# transitively) to other subprojects through cache variable.
-#set(${PROJECT_NAME}_INCLUDE_DIRS ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/include ${libshmfmi_INCLUDE_DIRS} CACHE INTERNAL "${PROJECT_NAME}: Include Directories" FORCE)
+#if(NOT APPLE)
+#https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man3/pthread.3.html 
+#it is included in system
+find_library(PTHREAD_LIBRARY NAMES libwinpthread.dll.a)# libpthread.a libpthread.dylib )
+#message( INFO ${PTHREAD_LIBRARY})
+#target_link_libraries(${PROJECT_NAME}_main ${PTHREAD_LIBRARY} /C/msys64/mingw64/x86_64-w64-mingw32/lib/libwinpthread.a)
+#endif()
 
-#set(${PROJECT_NAME}_LIBS ${libshmfmi_LIBS} CACHE INTERNAL "${PROJECT_NAME}: Libraries" FORCE)
+
+
+#add_custom_command(${PROJECT_NAME}_main POST_BUILD COMMAND "find . -name *.exe -exec echo {} \; -exec bash -c \"objdump -p {} | grep 'DLL Name:'\" \;")
+
+
+
+

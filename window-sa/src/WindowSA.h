@@ -26,10 +26,11 @@ namespace adaptation
 #define ID_Window_SA_OUT_tau 4
 
 
-class Window_SA: public SemanticAdaptation<Window_SA>
+class Window_SA: public SemanticAdaptation<Window_SA>, public std::enable_shared_from_this<Window_SA>
 {
 public:
-	Window_SA(shared_ptr<std::string> resourceLocation);
+	Window_SA(shared_ptr<std::string> resourceLocation,const fmi2CallbackFunctions *functions);
+	void initialize();
 	virtual ~Window_SA();
 
 	void setFmiValue(fmi2ValueReference id, int value);
