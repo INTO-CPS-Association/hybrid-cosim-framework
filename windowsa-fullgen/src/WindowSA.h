@@ -90,3 +90,5 @@
 				double stored_windowsa_speed;
 		};
 	}
+	
+	#endif

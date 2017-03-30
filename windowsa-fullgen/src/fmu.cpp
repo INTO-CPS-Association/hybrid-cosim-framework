@@ -26,7 +26,7 @@ using namespace std;
 const fmi2CallbackFunctions *g_functions;
 std::string* name;
 
-shared_ptr<adaptation::Window_SA> g_adaptation;
+shared_ptr<adaptation::WindowSA> g_adaptation;
 
 template<class T>
 static void log(const fmi2CallbackFunctions *functions,
@@ -66,7 +66,7 @@ extern "C" fmi2Component fmi2Instantiate(fmi2String instanceName,
 	g_functions = functions;
 	fmiprintf("instantiating %s\n", instanceName);
 	auto resourceLoc = make_shared<std::string>(fmuResourceLocation);
-	g_adaptation = make_shared<adaptation::Window_SA>(resourceLoc,functions);
+	g_adaptation = make_shared<adaptation::WindowSA>(resourceLoc,functions);
 	g_adaptation->initialize();
 
 	if (g_adaptation->getLastErrorState() != fmi2OK)
@@ -137,7 +137,7 @@ extern "C" fmi2Status fmi2GetReal(fmi2Component c,
 		return status;
 
 	for (int i = 0; i < nvr; i++) {
-		value[i] = g_adaptation->getFmiValueDouble(vr[i]);
+		value[i] = g_adaptation->getFmiValueReal(vr[i]);
 
 		status = g_adaptation->getLastErrorState();
 		if (status != fmi2OK)

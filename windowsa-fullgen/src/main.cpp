@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
 	fmi2CallbackFunctions callback = { &fmuLoggerCache, NULL, NULL, NULL, NULL };
 	fmi2Component comp =
 			fmi2Instantiate("this system", fmi2CoSimulation, "{1234}",
-					"c:\\Users\\kel\\Downloads\\hybridCosimulation-framework.git\\window-sa",
+					"C:\\source\\intocps\\hybridCosimulation-framework\\windowsa-fullgen",
 					&callback, fmi2True,
 					fmi2True);
 

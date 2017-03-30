@@ -10,19 +10,14 @@ namespace adaptation
 		this->stored_windowsa_reaction_force = 0.0;
 		this->stored_windowsa_displacement = 0.0;
 		this->stored_windowsa_speed = 0.0;
-		
-		const char* path = Fmu::combinePath(resourceLocation, make_shared<string>("Window.fmu"))->c_str();
-		auto windowFmu = make_shared<fmi2::Fmu>(path);
-		windowFmu->initialize();
-		this->window = windowFmu->instantiate("window",fmi2CoSimulation, "{efb4a002-4c0c-487b-8816-c0311d2f04d9}", true, true, make_shared<Callback>()); 
 	}
 	
 	void WindowSA::initialize()
 	{
-		const char* path = Fmu::combinePath(resourceLocation, make_shared<string>("Window.fmu"))->c_str();
+		auto path = Fmu::combinePath(resourceLocation, make_shared<string>("Window.fmu"));
 		auto windowFmu = make_shared<fmi2::Fmu>(*path);
 		windowFmu->initialize();
-		this->window = windowFmu->instantiate("window",fmi2CoSimulation, "{efb4a002-4c0c-487b-8816-c0311d2f04d9}", true, true, shared_from_this());
+		this->window = windowFmu->instantiate("window",fmi2CoSimulation, "{2ba08734-b2a0-438d-bc67-080d35fddf44}", true, true, shared_from_this());
 		
 		if(this->window->component == NULL)
 			this->lastErrorState = fmi2Fatal;
@@ -152,25 +147,25 @@ namespace adaptation
 		
 		list->push_back(
 			(Rule<WindowSA>){
-				&WindowSA::in_rule_condition1(),
-				&WindowSA::in_rule_body1(),
-				&WindowSA::in_rule_flush1()
+				&WindowSA::in_rule_condition1,
+				&WindowSA::in_rule_body1,
+				&WindowSA::in_rule_flush1
 			});
 		
 		
 		list->push_back(
 			(Rule<WindowSA>){
-				&WindowSA::in_rule_condition2(),
-				&WindowSA::in_rule_body2(),
-				&WindowSA::in_rule_flush2()
+				&WindowSA::in_rule_condition2,
+				&WindowSA::in_rule_body2,
+				&WindowSA::in_rule_flush2
 			});
 		
 		
 		list->push_back(
 			(Rule<WindowSA>){
-				&WindowSA::in_rule_condition3(),
-				&WindowSA::in_rule_body3(),
-				&WindowSA::in_rule_flush3()
+				&WindowSA::in_rule_condition3,
+				&WindowSA::in_rule_body3,
+				&WindowSA::in_rule_flush3
 			});
 		
 		
@@ -208,17 +203,17 @@ namespace adaptation
 		
 		list->push_back(
 			(Rule<WindowSA>){
-				&WindowSA::out_rule_condition1(),
-				&WindowSA::out_rule_body1(),
-				&WindowSA::out_rule_flush1()
+				&WindowSA::out_rule_condition1,
+				&WindowSA::out_rule_body1,
+				&WindowSA::out_rule_flush1
 			});
 		
 		
 		list->push_back(
 			(Rule<WindowSA>){
-				&WindowSA::out_rule_condition2(),
-				&WindowSA::out_rule_body2(),
-				&WindowSA::out_rule_flush2()
+				&WindowSA::out_rule_condition2,
+				&WindowSA::out_rule_body2,
+				&WindowSA::out_rule_flush2
 			});
 		
 		
