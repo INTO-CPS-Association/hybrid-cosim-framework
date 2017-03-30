@@ -77,7 +77,7 @@ protected:
 
 	shared_ptr<std::string> resourceLocation;
 
-	shared_ptr<std::list<shared_ptr<FmuComponent>>> incstances;
+	shared_ptr<std::list<shared_ptr<FmuComponent>>> instances;
 private:
 	shared_ptr<std::list<Rule<T>>> inRules;
 	shared_ptr<std::list<Rule<T>>> outRules;
@@ -102,7 +102,7 @@ SemanticAdaptation<T>::SemanticAdaptation(
 
 	this->enablesInRules = make_shared<std::list<Rule<T>>>();
 	this->enablesOutRules = make_shared<std::list<Rule<T>>>();
-	this->incstances = make_shared<std::list<shared_ptr<FmuComponent>>>();
+	this->instances = make_shared<std::list<shared_ptr<FmuComponent>>>();
 
 }
 
@@ -310,7 +310,7 @@ fmi2Status SemanticAdaptation<T>::fmi2SetupExperiment(
 		fmi2Boolean stopTimeDefined, fmi2Real stopTime) {
 
 	fmi2Status status = fmi2OK;
-	for (auto itr = this->incstances->begin(), end = this->incstances->end();
+	for (auto itr = this->instances->begin(), end = this->instances->end();
 			itr != end; ++itr) {
 		status = (*itr)->fmu->setupExperiment((*itr)->component,
 				toleranceDefined, tolerance, startTime, stopTimeDefined,
@@ -327,7 +327,7 @@ fmi2Status SemanticAdaptation<T>::fmi2SetupExperiment(
 template<class T>
 fmi2Status SemanticAdaptation<T>::fmi2EnterInitializationMode() {
 	fmi2Status status = fmi2OK;
-	for (auto itr = this->incstances->begin(), end = this->incstances->end();
+	for (auto itr = this->instances->begin(), end = this->instances->end();
 			itr != end; ++itr) {
 		status = (*itr)->fmu->enterInitializationMode((*itr)->component);
 
@@ -341,7 +341,7 @@ fmi2Status SemanticAdaptation<T>::fmi2EnterInitializationMode() {
 template<class T>
 fmi2Status SemanticAdaptation<T>::fmi2ExitInitializationMode() {
 	fmi2Status status = fmi2OK;
-	for (auto itr = this->incstances->begin(), end = this->incstances->end();
+	for (auto itr = this->instances->begin(), end = this->instances->end();
 			itr != end; ++itr) {
 		status = (*itr)->fmu->exitInitializationMode((*itr)->component);
 
@@ -356,7 +356,7 @@ fmi2Status SemanticAdaptation<T>::fmi2ExitInitializationMode() {
 template<class T>
 fmi2Status SemanticAdaptation<T>::fmi2Terminate() {
 	fmi2Status status = fmi2OK;
-	for (auto itr = this->incstances->begin(), end = this->incstances->end();
+	for (auto itr = this->instances->begin(), end = this->instances->end();
 			itr != end; ++itr) {
 		status = (*itr)->fmu->terminate((*itr)->component);
 

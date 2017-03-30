@@ -43,7 +43,7 @@ public:
 
 private:
 
-Window_SA*	getRuleThis();
+	Window_SA*	getRuleThis();
 
 	shared_ptr<std::list<Rule<Window_SA>>> createInputRules();
 	shared_ptr<std::list<Rule<Window_SA>>> createOutputRules();

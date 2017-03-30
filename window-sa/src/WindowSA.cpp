@@ -232,7 +232,7 @@ void Window_SA::initialize() {
 	if (this->window->component == NULL)
 		this->lastErrorState = fmi2Fatal;
 
-	this->incstances->push_back(this->window);
+	this->instances->push_back(this->window);
 
 }
 
