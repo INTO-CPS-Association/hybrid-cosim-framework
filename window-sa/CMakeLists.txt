@@ -31,7 +31,7 @@ list(REMOVE_ITEM CPP_FILES ${CPP_MAIN_FILES})
 
 ## library ##
 
-add_library(${PROJECT_NAME} ${CPP_FILES} ${CPP_FILES})
+add_library(${PROJECT_NAME} SHARED ${CPP_FILES} ${CPP_FILES})
 target_link_libraries(${PROJECT_NAME} hcf)
 set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
