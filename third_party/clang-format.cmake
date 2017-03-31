@@ -8,7 +8,16 @@
 #	endif ()
 #endforeach ()
 
-file(GLOB ALL_SOURCE_FILES **/*.c **/*.cpp **/*.h)
+file(GLOB_RECURSE ALL_SOURCE_FILES *.c *.cpp *.h)
+
+set (EXCLUDE_DIR "/third_party/")
+foreach (TMP_PATH ${ALL_SOURCE_FILES})
+    string (FIND ${TMP_PATH} ${EXCLUDE_DIR} EXCLUDE_DIR_FOUND)
+    if (NOT ${EXCLUDE_DIR_FOUND} EQUAL -1)
+        list (REMOVE_ITEM ALL_SOURCE_FILES ${TMP_PATH})
+    endif ()
+endforeach(TMP_PATH)
+
 
 add_custom_target(
 	clangformat
