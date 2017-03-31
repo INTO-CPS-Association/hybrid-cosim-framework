@@ -1,3 +1,12 @@
+# Checkout
+
+```bash
+# clone the repo
+git clone <repo-url>
+# fetch all submodules
+git submodule update --init --recursive
+```
+
 # Build instructions windows:
 Install msys2 http://www.msys2.org/
 Use msys2 to install the following:
@@ -7,7 +16,7 @@ Use msys2 to install the following:
 * Install zlib : pacman -S zlib
 
 From the root of the repository run the following command in the msys terminal:
-    cmake -DCMAKE_TOOLCHAIN_FILE=thrird_party/msys-toolchain.cmake .
+    cmake -DCMAKE_TOOLCHAIN_FILE=third_party/stability-test/thrird_party/msys-toolchain.cmake .
 
 Now each project can be build using make.
 
