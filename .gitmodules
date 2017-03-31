@@ -5,3 +5,7 @@
 	path = third_party/stability-test
 	url = git@gitlab.au.dk:into-cps/stability-test.git
 	ignore = dirty
+[submodule "third_party/googletest"]
+	path = third_party/googletest
+	url = https://github.com/google/googletest.git
+  depth = 1

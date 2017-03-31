@@ -24,6 +24,8 @@ project (hcf C CXX)
 
 include(third_party/clang-format.cmake)
 
+enable_testing()
+
 #set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_COLOR_MAKEFILE   ON)
 
@@ -38,6 +40,7 @@ if (WIN32)
 	set(CMAKE_C_USE_RESPONSE_FILE_FOR_LIBRARIES 0)
 endif() 
 
+add_subdirectory(third_party/googletest/googletest)
 add_subdirectory (third_party/stability-test)
 add_subdirectory (semantic-adaptation)
 add_subdirectory (window-sa)
@@ -45,4 +48,3 @@ add_subdirectory (window)
 add_subdirectory (windowsa-fullgen)
 
 #add_subdirectory (window-sa-gen)
-
