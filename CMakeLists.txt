@@ -41,7 +41,7 @@ if (WIN32)
 endif() 
 
 add_subdirectory(third_party/googletest/googletest)
-add_subdirectory (third_party/stability-test)
+add_subdirectory (third_party/into-cpp-fmi)
 add_subdirectory (semantic-adaptation)
 add_subdirectory (window-sa)
 add_subdirectory (window)

@@ -45,7 +45,7 @@ file(GLOB CPP_FILES src/*.cpp)
 
 add_library(${PROJECT_NAME} ${C_FILES} ${CPP_FILES})
 
-target_link_libraries(${PROJECT_NAME} fmu)
+target_link_libraries(${PROJECT_NAME} intocppfmi)
 target_include_directories(${PROJECT_NAME} PUBLIC src)
 
 set_target_properties(${PROJECT_NAME}
