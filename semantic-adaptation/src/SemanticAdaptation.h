@@ -37,8 +37,17 @@ using namespace std;
 using namespace fmi2;
 namespace adaptation {
 
+#define THROW_STATUS_EXCEPTION if(status== fmi2Fatal || status==fmi2Error) \
+{\
+	throw SemanticAdaptationFmiException(status);\
+}
+
 struct SemanticAdaptationFmiException : public exception{
 	fmi2Status status;
+	SemanticAdaptationFmiException(fmi2Status status){
+		this->status = status;
+	}
+
 };
 
 template<class T>
@@ -234,6 +243,7 @@ fmi2Status SemanticAdaptation<T>::setValue(shared_ptr<FmuComponent> fmuComp,
 	if (status != fmi2OK) {
 		cerr << "setInteger failed: " << id << " " << status << endl;
 		this->lastErrorState = status;
+		THROW_STATUS_EXCEPTION;
 	}
 	return status;
 }
@@ -250,6 +260,7 @@ fmi2Status SemanticAdaptation<T>::setValue(shared_ptr<FmuComponent> fmuComp,
 	if (status != fmi2OK) {
 		cerr << "setBoolean failed: " << id << " " << status << endl;
 		this->lastErrorState = status;
+		THROW_STATUS_EXCEPTION;
 	}
 	return status;
 }
@@ -265,6 +276,7 @@ fmi2Status SemanticAdaptation<T>::setValue(shared_ptr<FmuComponent> fmuComp,
 	if (status != fmi2OK) {
 		cerr << "setReal failed: " << id << " " << status << endl;
 		this->lastErrorState = status;
+		THROW_STATUS_EXCEPTION;
 	}
 
 	return status;
@@ -291,7 +303,10 @@ double SemanticAdaptation<T>::do_step(shared_ptr<FmuComponent> fmuComp, double t
 				cerr << "fmi2getRealStatus failed: t: " << t << " h: " << H << " " << status
 				<< endl;
 				this->lastErrorState = status;
+				THROW_STATUS_EXCEPTION;
 			}
+		}else{
+			THROW_STATUS_EXCEPTION;
 		}
 	}
 	
@@ -310,6 +325,7 @@ int SemanticAdaptation<T>::getValueInteger(shared_ptr<FmuComponent> fmuComp,
 	if (status != fmi2OK) {
 		cerr << "getInteger failed: " << id << " " << status << endl;
 		this->lastErrorState = status;
+		THROW_STATUS_EXCEPTION;
 	}
 
 	return v[0];
@@ -326,6 +342,7 @@ bool SemanticAdaptation<T>::getValueBoolean(shared_ptr<FmuComponent> fmuComp,
 	if (status != fmi2OK) {
 		cerr << "getBoolean failed: " << id << " " << status << endl;
 		this->lastErrorState = status;
+		THROW_STATUS_EXCEPTION;
 	}
 
 	return v[0];
@@ -341,6 +358,7 @@ double SemanticAdaptation<T>::getValueDouble(shared_ptr<FmuComponent> fmuComp,
 	if (status != fmi2OK) {
 		cerr << "getReal failed: " << id << " " << status << endl;
 		this->lastErrorState = status;
+		THROW_STATUS_EXCEPTION;
 	}
 
 	return v[0];
@@ -368,10 +386,12 @@ fmi2Status SemanticAdaptation<T>::fmi2SetupExperiment(
 				stopTime);
 
 		if (status != fmi2OK) {
+			THROW_STATUS_EXCEPTION;
 			return status;
 		}
 
 	}
+
 	return this->lastErrorState;
 }
 
@@ -383,6 +403,7 @@ fmi2Status SemanticAdaptation<T>::fmi2EnterInitializationMode() {
 		status = (*itr)->fmu->enterInitializationMode((*itr)->component);
 
 		if (status != fmi2OK) {
+			THROW_STATUS_EXCEPTION;
 			return status;
 		}
 
@@ -397,6 +418,7 @@ fmi2Status SemanticAdaptation<T>::fmi2ExitInitializationMode() {
 		status = (*itr)->fmu->exitInitializationMode((*itr)->component);
 
 		if (status != fmi2OK) {
+			THROW_STATUS_EXCEPTION;
 			return status;
 		}
 
@@ -412,6 +434,7 @@ fmi2Status SemanticAdaptation<T>::fmi2Terminate() {
 		status = (*itr)->fmu->terminate((*itr)->component);
 
 		if (status != fmi2OK) {
+			THROW_STATUS_EXCEPTION;
 			return status;
 		}
 
@@ -429,9 +452,6 @@ template<class T>
 void SemanticAdaptation<T>::log(fmi2String instanceName, fmi2Status status,
 		fmi2String category, fmi2String message) {
 
-	// (fmi2ComponentEnvironment, fmi2String, fmi2Status, fmi2String, fmi2String, ...);
-//	void *componentEnvironment, fmi2String instanceName, fmi2Status status, fmi2String category,
-//			fmi2String message, .
 	string name (instanceName);
 	name.insert(0,string("adapted-"));
 	if (this->fmiFunctions != NULL && this->fmiFunctions->logger != NULL) {

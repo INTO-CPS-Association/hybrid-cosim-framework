@@ -257,8 +257,8 @@ void Window_SA::initialize() {
 
 }
 
-void Window_SA::executeInternalControlFlow(double h, double dt) {
-	this->do_step(window, h, dt); // includes update_in rules and update_out (update-in rules do not update state)
+double Window_SA::executeInternalControlFlow(double h, double dt) {
+	return this->do_step(window, h, dt); // includes update_in rules and update_out (update-in rules do not update state)
 }
 
 } /* namespace fmi2 */

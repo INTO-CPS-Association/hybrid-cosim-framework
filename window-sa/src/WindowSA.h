@@ -91,7 +91,7 @@ private:
 	void out_rule_body2();
 	void out_rule_flush2();
 
-	void executeInternalControlFlow(double h, double dt);
+	double executeInternalControlFlow(double h, double dt);
 
 	shared_ptr<FmuComponent> window;
 
