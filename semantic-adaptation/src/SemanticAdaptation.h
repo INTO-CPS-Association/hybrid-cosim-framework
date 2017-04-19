@@ -37,6 +37,10 @@ using namespace std;
 using namespace fmi2;
 namespace adaptation {
 
+struct SemanticAdaptationFmiException : public exception{
+	fmi2Status status;
+};
+
 template<class T>
 class SemanticAdaptation: public fmi2::Callback {
 public:
