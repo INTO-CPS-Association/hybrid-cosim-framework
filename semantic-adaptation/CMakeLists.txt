@@ -36,6 +36,8 @@ else()
         message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
+add_subdirectory (third_party/into-cpp-fmi)
+
 include_directories(src)
 
 add_definitions(-DFMI_COSIMULATION)

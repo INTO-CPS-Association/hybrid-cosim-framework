@@ -1,12 +1,9 @@
-[submodule "third_party/fmi"]
-	path = third_party/fmi
-	url = https://github.com/into-cps/fmi.git
-[submodule "third_party/into-cpp-fmi"]
-	path = third_party/into-cpp-fmi
-	url = https://github.com/into-cps/into-cpp-fmi.git
-	ignore = dirty
-	depth = 1
 [submodule "third_party/googletest"]
 	path = third_party/googletest
 	url = https://github.com/google/googletest.git
+  depth = 1
+[submodule "semantic-adaptation/third_party/into-cpp-fmi"]
+	path = semantic-adaptation/third_party/into-cpp-fmi
+	url = https://github.com/into-cps/into-cpp-fmi.git
+	ignore = dirty
   depth = 1
