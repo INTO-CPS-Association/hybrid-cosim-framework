@@ -75,10 +75,12 @@ public:
 	fmi2Status fmi2ExitInitializationMode();
 	fmi2Status fmi2Terminate();
 	/*FMI Calls END*/
+	
+	double getLastSuccessfulTime();
 
 protected:
-	virtual void executeInternalControlFlow(double h, double dt)=0;
-	void do_step(shared_ptr<FmuComponent>,double t,double H);
+	virtual double executeInternalControlFlow(double h, double dt)=0;
+	double do_step(shared_ptr<FmuComponent>,double t,double H);
 
 	const fmi2CallbackFunctions *fmiFunctions=NULL;
 	MooreOrMealy machineType;
@@ -107,6 +109,8 @@ private:
 	shared_ptr<std::list<Rule<T>>> enablesOutRules;
 
 	void flushAllEnabledInRules();
+	
+	double lastSuccessfulTime = 0.0;
 
 };
 
@@ -194,13 +198,18 @@ fmi2Status SemanticAdaptation<T>::flushAllEnabledOutRules() {
 }
 
 template<class T>
+double SemanticAdaptation<T>::getLastSuccessfulTime() {
+	return this->lastSuccessfulTime;
+}
+
+template<class T>
 fmi2Status SemanticAdaptation<T>::executeControlFlow(double h, double dt) {
 	this->enablesOutRules->clear();
 
 	//flush all enabled in-rules
 	flushAllEnabledInRules();
 
-	executeInternalControlFlow(h, dt);
+	lastSuccessfulTime = executeInternalControlFlow(h, dt);
 
 	//execute the body of all out-rules with a true condition and enable them
 	executeOutRules();
@@ -258,14 +267,31 @@ fmi2Status SemanticAdaptation<T>::setValue(shared_ptr<FmuComponent> fmuComp,
 }
 
 template<class T>
-void SemanticAdaptation<T>::do_step(shared_ptr<FmuComponent> fmuComp, double t,
+double SemanticAdaptation<T>::do_step(shared_ptr<FmuComponent> fmuComp, double t,
 		double H) {
 	fmi2Status status = fmuComp->fmu->doStep(fmuComp->component, t, H, false);
 	if (status != fmi2OK) {
 		cerr << "do_step failed: t: " << t << " h: " << H << " " << status
 				<< endl;
 		this->lastErrorState = status;
+		if(status == fmi2Discard)
+		{
+			double h;
+			status = fmuComp->fmu->getRealStatus(fmuComp->component, fmi2StatusKind::fmi2LastSuccessfulTime, &h);
+			if(status == fmi2OK)
+			{
+				return h;
+			}
+			else
+			{
+				cerr << "fmi2getRealStatus failed: t: " << t << " h: " << H << " " << status
+				<< endl;
+				this->lastErrorState = status;
+			}
+		}
 	}
+	
+	return H;
 }
 
 template<class T>
