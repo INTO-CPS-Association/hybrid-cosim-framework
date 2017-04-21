@@ -227,8 +227,8 @@ Window_SA* Window_SA::getRuleThis() {
 	return this;
 }
 
-Window_SA::Window_SA(shared_ptr<std::string> resourceLocation,const fmi2CallbackFunctions *functions) :
-		SemanticAdaptation(resourceLocation, createInputRules(),
+Window_SA::Window_SA(shared_ptr<std::string> fmiInstanceName,shared_ptr<std::string> resourceLocation,const fmi2CallbackFunctions *functions) :
+		SemanticAdaptation(fmiInstanceName,resourceLocation, createInputRules(),
 				createOutputRules(),functions) {
 	reaction_force = displacement = speed = disp = tau =
 			stored_windowsa_reaction_force = stored_windowsa_displacement =

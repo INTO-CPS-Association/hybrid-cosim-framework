@@ -53,7 +53,7 @@ struct SemanticAdaptationFmiException : public exception{
 template<class T>
 class SemanticAdaptation: public fmi2::Callback {
 public:
-	SemanticAdaptation(shared_ptr<std::string> resourceLocation,
+	SemanticAdaptation(shared_ptr<std::string> fmiInstanceName, shared_ptr<std::string> resourceLocation,
 			shared_ptr<std::list<Rule<T>>>inRules, shared_ptr<std::list<Rule<T>>> outRules,const fmi2CallbackFunctions *functions);
 	virtual void initialize()=0;
 	virtual ~SemanticAdaptation();
@@ -112,6 +112,7 @@ protected:
 	shared_ptr<std::string> lastErrorMessage;
 
 	shared_ptr<std::string> resourceLocation;
+	shared_ptr<std::string> fmiInstanceName;
 
 	shared_ptr<std::list<shared_ptr<FmuComponent>>> instances;
 private:
@@ -128,9 +129,10 @@ private:
 };
 
 template<class T>
-SemanticAdaptation<T>::SemanticAdaptation(
+SemanticAdaptation<T>::SemanticAdaptation(shared_ptr<std::string> fmiInstanceName,
 		shared_ptr<std::string> resourceLocation, shared_ptr<std::list<Rule<T>>>inRules, shared_ptr<std::list<Rule<T>>> outRules,const fmi2CallbackFunctions *functions)
 {
+	this->fmiInstanceName = fmiInstanceName;
 	this->resourceLocation = resourceLocation;
 	this->machineType = Mealy;
 	this->inRules = inRules;
@@ -452,12 +454,13 @@ template<class T>
 void SemanticAdaptation<T>::log(fmi2String instanceName, fmi2Status status,
 		fmi2String category, fmi2String message) {
 
-	string name (instanceName);
-	name.insert(0,string("adapted-"));
+
 	if (this->fmiFunctions != NULL && this->fmiFunctions->logger != NULL) {
 
-		this->fmiFunctions->logger(getComponent(),name.c_str(),status,category,message);
+		this->fmiFunctions->logger(getComponent(),fmiInstanceName->c_str(),status,category,message);
 	} else {
+		string name (instanceName);
+		name.insert(0,string("adapted-"));
 		cout << "-Adapted-" << Fmu::fmi2StatusToString(status)->c_str() << " "
 				<< instanceName << " - " << category << " " << message << endl;
 

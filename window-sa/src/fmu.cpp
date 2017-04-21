@@ -80,7 +80,8 @@ extern "C" fmi2Component fmi2Instantiate(fmi2String instanceName, fmi2Type fmuTy
 	g_functions = functions;
 	fmiprintf("instantiating %s\n", instanceName);
 	auto resourceLoc = make_shared<std::string>(fmuResourceLocation);
-	g_adaptation = make_shared<adaptation::Window_SA>(resourceLoc, functions);
+	auto name  = make_shared<std::string>(instanceName);
+	g_adaptation = make_shared<adaptation::Window_SA>(name,resourceLoc, functions);
 	try
 	{
 		g_adaptation->initialize();
