@@ -50,6 +50,14 @@ add_library(${PROJECT_NAME} ${C_FILES} ${CPP_FILES})
 target_link_libraries(${PROJECT_NAME} intocppfmi)
 target_include_directories(${PROJECT_NAME} PUBLIC src)
 
+if (UNIX)
+	if(APPLE)
+		
+	else()
+ 		target_link_libraries(${PROJECT_NAME} m)
+	endif()
+endif()
+
 set_target_properties(${PROJECT_NAME}
                       PROPERTIES POSITION_INDEPENDENT_CODE ON)
 

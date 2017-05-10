@@ -31,27 +31,33 @@
 
 #include <iostream>
 #include <list>
+#include <algorithm>
+#include <math.h>
 #include "Rule.h"
 #include "Fmu.h"
 using namespace std;
 using namespace fmi2;
-namespace adaptation {
+namespace adaptation
+{
 
 #define THROW_STATUS_EXCEPTION if(status== fmi2Fatal || status==fmi2Error) \
 {\
 	throw SemanticAdaptationFmiException(status);\
 }
 
-struct SemanticAdaptationFmiException : public exception{
+struct SemanticAdaptationFmiException: public exception
+{
 	fmi2Status status;
-	SemanticAdaptationFmiException(fmi2Status status){
+	SemanticAdaptationFmiException(fmi2Status status)
+	{
 		this->status = status;
 	}
 
 };
 
 template<class T>
-class SemanticAdaptation: public fmi2::Callback {
+class SemanticAdaptation: public fmi2::Callback
+{
 public:
 	SemanticAdaptation(shared_ptr<std::string> fmiInstanceName, shared_ptr<std::string> resourceLocation,
 			shared_ptr<std::list<Rule<T>>>inRules, shared_ptr<std::list<Rule<T>>> outRules,const fmi2CallbackFunctions *functions);
@@ -88,7 +94,7 @@ public:
 	fmi2Status fmi2ExitInitializationMode();
 	fmi2Status fmi2Terminate();
 	/*FMI Calls END*/
-	
+
 	double getLastSuccessfulTime();
 
 protected:
@@ -105,6 +111,8 @@ protected:
 	int getValueInteger(shared_ptr<FmuComponent>,fmi2ValueReference id );
 	bool getValueBoolean(shared_ptr<FmuComponent>,fmi2ValueReference id );
 	double getValueDouble(shared_ptr<FmuComponent>,fmi2ValueReference id );
+
+	double getMextTimeStep(shared_ptr<FmuComponent>);
 
 	virtual T* getRuleThis() =0;
 
@@ -123,7 +131,7 @@ private:
 	shared_ptr<std::list<Rule<T>>> enablesOutRules;
 
 	void flushAllEnabledInRules();
-	
+
 	double lastSuccessfulTime = 0.0;
 
 };
@@ -147,19 +155,23 @@ SemanticAdaptation<T>::SemanticAdaptation(shared_ptr<std::string> fmiInstanceNam
 }
 
 template<class T>
-SemanticAdaptation<T>::~SemanticAdaptation() {
+SemanticAdaptation<T>::~SemanticAdaptation()
+{
 	// TODO Auto-generated destructor stub
 }
 
 template<class T>
-fmi2Status SemanticAdaptation<T>::executeInRules() {
+fmi2Status SemanticAdaptation<T>::executeInRules()
+{
 	//http://stackoverflow.com/questions/2898316/using-a-member-function-pointer-within-a-class
-	for (auto itr = this->inRules->begin(), end = this->inRules->end();
-			itr != end; ++itr) {
+	for (auto itr = this->inRules->begin(), end = this->inRules->end(); itr != end; ++itr)
+	{
 		Rule<T> rule = *itr;
-		if (((*getRuleThis()).*rule.condition)()) {
+		if (((*getRuleThis()).*rule.condition)())
+		{
 			((*getRuleThis()).*rule.body)();
-			if (this->machineType == Mealy) {
+			if (this->machineType == Mealy)
+			{
 				((*getRuleThis()).*rule.flush)();
 			}
 			this->enablesInRules->push_back(*itr);
@@ -169,18 +181,22 @@ fmi2Status SemanticAdaptation<T>::executeInRules() {
 }
 
 template<class T>
-fmi2Status SemanticAdaptation<T>::executeOutRules() {
-	if (this->enablesOutRules->size() > 0) {
+fmi2Status SemanticAdaptation<T>::executeOutRules()
+{
+	if (this->enablesOutRules->size() > 0)
+	{
 		//not sure why
 		return fmi2OK;
 	}
 
-	for (auto itr = this->outRules->begin(), end = this->outRules->end();
-			itr != end; ++itr) {
+	for (auto itr = this->outRules->begin(), end = this->outRules->end(); itr != end; ++itr)
+	{
 		Rule<T> rule = *itr;
-		if (((*getRuleThis()).*rule.condition)()) {
+		if (((*getRuleThis()).*rule.condition)())
+		{
 			((*getRuleThis()).*rule.body)();
-			if (this->machineType == Mealy) {
+			if (this->machineType == Mealy)
+			{
 				((*getRuleThis()).*rule.flush)();
 			}
 			this->enablesOutRules->push_back(*itr);
@@ -191,9 +207,10 @@ fmi2Status SemanticAdaptation<T>::executeOutRules() {
 }
 
 template<class T>
-void SemanticAdaptation<T>::flushAllEnabledInRules() {
-	for (auto itr = this->enablesInRules->begin(), end =
-			this->enablesInRules->end(); itr != end; ++itr) {
+void SemanticAdaptation<T>::flushAllEnabledInRules()
+{
+	for (auto itr = this->enablesInRules->begin(), end = this->enablesInRules->end(); itr != end; ++itr)
+	{
 		Rule<T> rule = *itr;
 		((*getRuleThis()).*rule.flush)();
 
@@ -201,9 +218,10 @@ void SemanticAdaptation<T>::flushAllEnabledInRules() {
 }
 
 template<class T>
-fmi2Status SemanticAdaptation<T>::flushAllEnabledOutRules() {
-	for (auto itr = this->enablesOutRules->begin(), end =
-			this->enablesOutRules->end(); itr != end; ++itr) {
+fmi2Status SemanticAdaptation<T>::flushAllEnabledOutRules()
+{
+	for (auto itr = this->enablesOutRules->begin(), end = this->enablesOutRules->end(); itr != end; ++itr)
+	{
 		Rule<T> rule = *itr;
 		((*getRuleThis()).*rule.flush)();
 
@@ -213,12 +231,14 @@ fmi2Status SemanticAdaptation<T>::flushAllEnabledOutRules() {
 }
 
 template<class T>
-double SemanticAdaptation<T>::getLastSuccessfulTime() {
+double SemanticAdaptation<T>::getLastSuccessfulTime()
+{
 	return this->lastSuccessfulTime;
 }
 
 template<class T>
-fmi2Status SemanticAdaptation<T>::executeControlFlow(double h, double dt) {
+fmi2Status SemanticAdaptation<T>::executeControlFlow(double h, double dt)
+{
 	this->enablesOutRules->clear();
 
 	//flush all enabled in-rules
@@ -234,15 +254,17 @@ fmi2Status SemanticAdaptation<T>::executeControlFlow(double h, double dt) {
 }
 
 template<class T>
-fmi2Status SemanticAdaptation<T>::setValue(shared_ptr<FmuComponent> fmuComp,
-		fmi2ValueReference id, int value) {
-	const fmi2ValueReference vr[] { id };
+fmi2Status SemanticAdaptation<T>::setValue(shared_ptr<FmuComponent> fmuComp, fmi2ValueReference id, int value)
+{
+	const fmi2ValueReference vr[]
+	{ id };
 	size_t nvr = 1;
-	fmi2Integer v[] { value };
+	fmi2Integer v[]
+	{ value };
 
-	fmi2Status status = fmuComp->fmu->setInteger(fmuComp->component, vr, nvr,
-			v);
-	if (status != fmi2OK) {
+	fmi2Status status = fmuComp->fmu->setInteger(fmuComp->component, vr, nvr, v);
+	if (status != fmi2OK)
+	{
 		cerr << "setInteger failed: " << id << " " << status << endl;
 		this->lastErrorState = status;
 		THROW_STATUS_EXCEPTION;
@@ -251,15 +273,17 @@ fmi2Status SemanticAdaptation<T>::setValue(shared_ptr<FmuComponent> fmuComp,
 }
 
 template<class T>
-fmi2Status SemanticAdaptation<T>::setValue(shared_ptr<FmuComponent> fmuComp,
-		fmi2ValueReference id, bool value) {
-	const fmi2ValueReference vr[] { id };
+fmi2Status SemanticAdaptation<T>::setValue(shared_ptr<FmuComponent> fmuComp, fmi2ValueReference id, bool value)
+{
+	const fmi2ValueReference vr[]
+	{ id };
 	size_t nvr = 1;
-	fmi2Boolean v[] { value };
+	fmi2Boolean v[]
+	{ value };
 
-	fmi2Status status = fmuComp->fmu->setBoolean(fmuComp->component, vr, nvr,
-			v);
-	if (status != fmi2OK) {
+	fmi2Status status = fmuComp->fmu->setBoolean(fmuComp->component, vr, nvr, v);
+	if (status != fmi2OK)
+	{
 		cerr << "setBoolean failed: " << id << " " << status << endl;
 		this->lastErrorState = status;
 		THROW_STATUS_EXCEPTION;
@@ -268,14 +292,17 @@ fmi2Status SemanticAdaptation<T>::setValue(shared_ptr<FmuComponent> fmuComp,
 }
 
 template<class T>
-fmi2Status SemanticAdaptation<T>::setValue(shared_ptr<FmuComponent> fmuComp,
-		fmi2ValueReference id, double value) {
-	const fmi2ValueReference vr[] { id };
+fmi2Status SemanticAdaptation<T>::setValue(shared_ptr<FmuComponent> fmuComp, fmi2ValueReference id, double value)
+{
+	const fmi2ValueReference vr[]
+	{ id };
 	size_t nvr = 1;
-	fmi2Real v[] { value };
+	fmi2Real v[]
+	{ value };
 
 	fmi2Status status = fmuComp->fmu->setReal(fmuComp->component, vr, nvr, v);
-	if (status != fmi2OK) {
+	if (status != fmi2OK)
+	{
 		cerr << "setReal failed: " << id << " " << status << endl;
 		this->lastErrorState = status;
 		THROW_STATUS_EXCEPTION;
@@ -285,46 +312,46 @@ fmi2Status SemanticAdaptation<T>::setValue(shared_ptr<FmuComponent> fmuComp,
 }
 
 template<class T>
-double SemanticAdaptation<T>::do_step(shared_ptr<FmuComponent> fmuComp, double t,
-		double H) {
+double SemanticAdaptation<T>::do_step(shared_ptr<FmuComponent> fmuComp, double t, double H)
+{
 	fmi2Status status = fmuComp->fmu->doStep(fmuComp->component, t, H, false);
-	if (status != fmi2OK) {
-		cerr << "do_step failed: t: " << t << " h: " << H << " " << status
-				<< endl;
+	if (status != fmi2OK)
+	{
+		cerr << "do_step failed: t: " << t << " h: " << H << " " << status << endl;
 		this->lastErrorState = status;
-		if(status == fmi2Discard)
+		if (status == fmi2Discard)
 		{
 			double h;
 			status = fmuComp->fmu->getRealStatus(fmuComp->component, fmi2StatusKind::fmi2LastSuccessfulTime, &h);
-			if(status == fmi2OK)
+			if (status == fmi2OK)
 			{
 				return h;
-			}
-			else
+			} else
 			{
-				cerr << "fmi2getRealStatus failed: t: " << t << " h: " << H << " " << status
-				<< endl;
+				cerr << "fmi2getRealStatus failed: t: " << t << " h: " << H << " " << status << endl;
 				this->lastErrorState = status;
 				THROW_STATUS_EXCEPTION;
 			}
-		}else{
+		} else
+		{
 			THROW_STATUS_EXCEPTION;
 		}
 	}
-	
+
 	return H;
 }
 
 template<class T>
-int SemanticAdaptation<T>::getValueInteger(shared_ptr<FmuComponent> fmuComp,
-		fmi2ValueReference id) {
-	const fmi2ValueReference vr[] { id };
+int SemanticAdaptation<T>::getValueInteger(shared_ptr<FmuComponent> fmuComp, fmi2ValueReference id)
+{
+	const fmi2ValueReference vr[]
+	{ id };
 	size_t nvr = 1;
 	fmi2Integer v[1];
 
-	fmi2Status status = fmuComp->fmu->getInteger(fmuComp->component, vr, nvr,
-			v);
-	if (status != fmi2OK) {
+	fmi2Status status = fmuComp->fmu->getInteger(fmuComp->component, vr, nvr, v);
+	if (status != fmi2OK)
+	{
 		cerr << "getInteger failed: " << id << " " << status << endl;
 		this->lastErrorState = status;
 		THROW_STATUS_EXCEPTION;
@@ -333,15 +360,16 @@ int SemanticAdaptation<T>::getValueInteger(shared_ptr<FmuComponent> fmuComp,
 	return v[0];
 }
 template<class T>
-bool SemanticAdaptation<T>::getValueBoolean(shared_ptr<FmuComponent> fmuComp,
-		fmi2ValueReference id) {
-	const fmi2ValueReference vr[] { id };
+bool SemanticAdaptation<T>::getValueBoolean(shared_ptr<FmuComponent> fmuComp, fmi2ValueReference id)
+{
+	const fmi2ValueReference vr[]
+	{ id };
 	size_t nvr = 1;
 	fmi2Boolean v[1];
 
-	fmi2Status status = fmuComp->fmu->getBoolean(fmuComp->component, vr, nvr,
-			v);
-	if (status != fmi2OK) {
+	fmi2Status status = fmuComp->fmu->getBoolean(fmuComp->component, vr, nvr, v);
+	if (status != fmi2OK)
+	{
 		cerr << "getBoolean failed: " << id << " " << status << endl;
 		this->lastErrorState = status;
 		THROW_STATUS_EXCEPTION;
@@ -350,14 +378,16 @@ bool SemanticAdaptation<T>::getValueBoolean(shared_ptr<FmuComponent> fmuComp,
 	return v[0];
 }
 template<class T>
-double SemanticAdaptation<T>::getValueDouble(shared_ptr<FmuComponent> fmuComp,
-		fmi2ValueReference id) {
-	const fmi2ValueReference vr[] { id };
+double SemanticAdaptation<T>::getValueDouble(shared_ptr<FmuComponent> fmuComp, fmi2ValueReference id)
+{
+	const fmi2ValueReference vr[]
+	{ id };
 	size_t nvr = 1;
 	fmi2Real v[1];
 
 	fmi2Status status = fmuComp->fmu->getReal(fmuComp->component, vr, nvr, v);
-	if (status != fmi2OK) {
+	if (status != fmi2OK)
+	{
 		cerr << "getReal failed: " << id << " " << status << endl;
 		this->lastErrorState = status;
 		THROW_STATUS_EXCEPTION;
@@ -367,27 +397,29 @@ double SemanticAdaptation<T>::getValueDouble(shared_ptr<FmuComponent> fmuComp,
 }
 
 template<class T>
-fmi2Status SemanticAdaptation<T>::getLastErrorState() {
+fmi2Status SemanticAdaptation<T>::getLastErrorState()
+{
 	return this->lastErrorState;
 }
 template<class T>
-shared_ptr<std::string> SemanticAdaptation<T>::getLastErrorMessage() {
+shared_ptr<std::string> SemanticAdaptation<T>::getLastErrorMessage()
+{
 	return this->lastErrorMessage;
 }
 
 template<class T>
-fmi2Status SemanticAdaptation<T>::fmi2SetupExperiment(
-		fmi2Boolean toleranceDefined, fmi2Real tolerance, fmi2Real startTime,
-		fmi2Boolean stopTimeDefined, fmi2Real stopTime) {
+fmi2Status SemanticAdaptation<T>::fmi2SetupExperiment(fmi2Boolean toleranceDefined, fmi2Real tolerance,
+		fmi2Real startTime, fmi2Boolean stopTimeDefined, fmi2Real stopTime)
+{
 
 	fmi2Status status = fmi2OK;
-	for (auto itr = this->instances->begin(), end = this->instances->end();
-			itr != end; ++itr) {
-		status = (*itr)->fmu->setupExperiment((*itr)->component,
-				toleranceDefined, tolerance, startTime, stopTimeDefined,
-				stopTime);
+	for (auto itr = this->instances->begin(), end = this->instances->end(); itr != end; ++itr)
+	{
+		status = (*itr)->fmu->setupExperiment((*itr)->component, toleranceDefined, tolerance, startTime,
+				stopTimeDefined, stopTime);
 
-		if (status != fmi2OK) {
+		if (status != fmi2OK)
+		{
 			THROW_STATUS_EXCEPTION;
 			return status;
 		}
@@ -398,13 +430,15 @@ fmi2Status SemanticAdaptation<T>::fmi2SetupExperiment(
 }
 
 template<class T>
-fmi2Status SemanticAdaptation<T>::fmi2EnterInitializationMode() {
+fmi2Status SemanticAdaptation<T>::fmi2EnterInitializationMode()
+{
 	fmi2Status status = fmi2OK;
-	for (auto itr = this->instances->begin(), end = this->instances->end();
-			itr != end; ++itr) {
+	for (auto itr = this->instances->begin(), end = this->instances->end(); itr != end; ++itr)
+	{
 		status = (*itr)->fmu->enterInitializationMode((*itr)->component);
 
-		if (status != fmi2OK) {
+		if (status != fmi2OK)
+		{
 			THROW_STATUS_EXCEPTION;
 			return status;
 		}
@@ -413,13 +447,15 @@ fmi2Status SemanticAdaptation<T>::fmi2EnterInitializationMode() {
 	return this->lastErrorState;
 }
 template<class T>
-fmi2Status SemanticAdaptation<T>::fmi2ExitInitializationMode() {
+fmi2Status SemanticAdaptation<T>::fmi2ExitInitializationMode()
+{
 	fmi2Status status = fmi2OK;
-	for (auto itr = this->instances->begin(), end = this->instances->end();
-			itr != end; ++itr) {
+	for (auto itr = this->instances->begin(), end = this->instances->end(); itr != end; ++itr)
+	{
 		status = (*itr)->fmu->exitInitializationMode((*itr)->component);
 
-		if (status != fmi2OK) {
+		if (status != fmi2OK)
+		{
 			THROW_STATUS_EXCEPTION;
 			return status;
 		}
@@ -429,13 +465,15 @@ fmi2Status SemanticAdaptation<T>::fmi2ExitInitializationMode() {
 }
 
 template<class T>
-fmi2Status SemanticAdaptation<T>::fmi2Terminate() {
+fmi2Status SemanticAdaptation<T>::fmi2Terminate()
+{
 	fmi2Status status = fmi2OK;
-	for (auto itr = this->instances->begin(), end = this->instances->end();
-			itr != end; ++itr) {
+	for (auto itr = this->instances->begin(), end = this->instances->end(); itr != end; ++itr)
+	{
 		status = (*itr)->fmu->terminate((*itr)->component);
 
-		if (status != fmi2OK) {
+		if (status != fmi2OK)
+		{
 			THROW_STATUS_EXCEPTION;
 			return status;
 		}
@@ -444,28 +482,54 @@ fmi2Status SemanticAdaptation<T>::fmi2Terminate() {
 	return this->lastErrorState;
 }
 
-
 template<class T>
-fmi2Component SemanticAdaptation<T>::getComponent(){
-	return (fmi2Component)1;
+fmi2Component SemanticAdaptation<T>::getComponent()
+{
+	return (fmi2Component) 1;
 }
 
 template<class T>
-void SemanticAdaptation<T>::log(fmi2String instanceName, fmi2Status status,
-		fmi2String category, fmi2String message) {
+void SemanticAdaptation<T>::log(fmi2String instanceName, fmi2Status status, fmi2String category, fmi2String message)
+{
 
+	if (this->fmiFunctions != NULL && this->fmiFunctions->logger != NULL)
+	{
 
-	if (this->fmiFunctions != NULL && this->fmiFunctions->logger != NULL) {
-
-		this->fmiFunctions->logger(getComponent(),fmiInstanceName->c_str(),status,category,message);
-	} else {
-		string name (instanceName);
-		name.insert(0,string("adapted-"));
-		cout << "-Adapted-" << Fmu::fmi2StatusToString(status)->c_str() << " "
-				<< instanceName << " - " << category << " " << message << endl;
+		this->fmiFunctions->logger(getComponent(), fmiInstanceName->c_str(), status, category, message);
+	} else
+	{
+		string name(instanceName);
+		name.insert(0, string("adapted-"));
+		cout << "-Adapted-" << Fmu::fmi2StatusToString(status)->c_str() << " " << instanceName << " - " << category
+				<< " " << message << endl;
 
 	}
 
+}
+
+template<class T>
+double SemanticAdaptation<T>::getMextTimeStep(shared_ptr<FmuComponent> fmuComp)
+{
+	double time = 0;
+
+	fmi2FMUstate state = NULL;
+	auto status = fmuComp->fmu->getFMUstate(fmuComp->component, &state);
+	THROW_STATUS_EXCEPTION;
+
+	status = fmuComp->fmu->doStep(fmuComp->component, lastSuccessfulTime, std::numeric_limits<fmi2Real>::max(), false);
+	THROW_STATUS_EXCEPTION;
+
+	if (status == fmi2Discard)
+	{
+		status = fmuComp->fmu->getRealStatus(fmuComp->component, fmi2LastSuccessfulTime, &time);
+		THROW_STATUS_EXCEPTION;
+	}
+	status = fmuComp->fmu->setFMUstate(fmuComp->component, state);
+	THROW_STATUS_EXCEPTION;
+	status = fmuComp->fmu->freeFMUstate(fmuComp->component, &state);
+	THROW_STATUS_EXCEPTION;
+
+	return time;
 }
 
 }
