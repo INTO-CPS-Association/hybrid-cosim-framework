@@ -47,7 +47,7 @@ file(GLOB CPP_FILES src/*.cpp)
 
 add_library(${PROJECT_NAME} ${C_FILES} ${CPP_FILES})
 
-target_link_libraries(${PROJECT_NAME} intocppfmi)
+target_link_libraries(${PROJECT_NAME} PUBLIC intocppfmi)
 target_include_directories(${PROJECT_NAME} PUBLIC src)
 
 if (UNIX)

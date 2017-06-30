@@ -16,10 +16,10 @@ Use msys2 to install the following:
 * Install zlib : pacman -S zlib
 
 From the root of the repository run the following command in the msys terminal:
-    cmake -DCMAKE_TOOLCHAIN_FILE=semantic_adaptation/third_party/into-cpp-fmi/thrird_party/msys-toolchain.cmake .
+    cmake -DCMAKE_TOOLCHAIN_FILE=semantic-adaptation/third_party/into-cpp-fmi/thrird_party/msys-toolchain.cmake .
 
 Now each project can be build using make.
 
 ### Eclipse
 To import into eclipse use eclipse CDT and select 
-file -> import -> Exisiting Code as Makefile Project
+file -> import -> Existing Code as Makefile Project
