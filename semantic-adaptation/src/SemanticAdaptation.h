@@ -31,6 +31,9 @@
 
 #include <iostream>
 #include <list>
+#include <stack>          // std::stack
+#include <deque>          // std::deque
+#include <map>
 #include <algorithm>
 #include <math.h>
 #include "Rule.h"
@@ -101,6 +104,9 @@ protected:
 	virtual double executeInternalControlFlow(double h, double dt)=0;
 	double do_step(shared_ptr<FmuComponent>,double t,double H);
 
+	void save_state(shared_ptr<FmuComponent>);
+	void rollback(shared_ptr<FmuComponent>);
+
 	const fmi2CallbackFunctions *fmiFunctions=NULL;
 	MooreOrMealy machineType;
 
@@ -134,6 +140,11 @@ private:
 
 	double lastSuccessfulTime = 0.0;
 
+	shared_ptr<std::map<fmi2Component,std::stack<fmi2FMUstate>>> instanceStates;
+//	  typedef fmi2Status fmi2GetFMUstateTYPE           (fmi2Component, fmi2FMUstate*);
+//	   typedef fmi2Status fmi2SetFMUstateTYPE           (fmi2Component, fmi2FMUstate);
+//	   typedef fmi2Status fmi2FreeFMUstateTYPE          (fmi2Component, fmi2FMUstate*);
+
 };
 
 template<class T>
@@ -151,6 +162,7 @@ SemanticAdaptation<T>::SemanticAdaptation(shared_ptr<std::string> fmiInstanceNam
 	this->enablesInRules = make_shared<std::list<Rule<T>>>();
 	this->enablesOutRules = make_shared<std::list<Rule<T>>>();
 	this->instances = make_shared<std::list<shared_ptr<FmuComponent>>>();
+	this->instanceStates = make_shared<std::map<fmi2Component,std::stack<fmi2FMUstate>>>();
 
 }
 
@@ -342,6 +354,56 @@ double SemanticAdaptation<T>::do_step(shared_ptr<FmuComponent> fmuComp, double t
 }
 
 template<class T>
+void SemanticAdaptation<T>::save_state(shared_ptr<FmuComponent> fmuComp)
+{
+
+	fmi2FMUstate state;
+
+	auto status = fmuComp->fmu->getFMUstate(fmuComp->component, &state);
+	if (status != fmi2OK)
+	{
+		cerr << "save_state failed: " << status << endl;
+		this->lastErrorState = status;
+		THROW_STATUS_EXCEPTION;
+	} else
+	{
+		auto itr = this->instanceStates->find(fmuComp->component);
+		if (itr != this->instanceStates->end())
+		{
+			itr.second.push(state);
+		}
+	}
+}
+
+template<class T>
+void SemanticAdaptation<T>::rollback(shared_ptr<FmuComponent> fmuComp)
+{
+	auto itr = this->instanceStates->find(fmuComp->component);
+	if (itr != this->instanceStates->end())
+	{
+		if (!itr.second.empty())
+		{
+			auto state = itr.second.top();
+
+			auto status = fmuComp->fmu->setFMUstate(fmuComp->component, state);
+			if (status != fmi2OK)
+			{
+				cerr << "rollback failed: " << status << endl;
+				this->lastErrorState = status;
+				THROW_STATUS_EXCEPTION;
+			}
+
+			if (fmuComp->fmu->freeFMUstate(fmuComp->component, &state) != fmi2OK)
+			{
+				//TODO handle error for set state
+			}
+
+			itr.second.pop();
+		}
+	}
+}
+
+template<class T>
 int SemanticAdaptation<T>::getValueInteger(shared_ptr<FmuComponent> fmuComp, fmi2ValueReference id)
 {
 	const fmi2ValueReference vr[]
@@ -415,8 +477,12 @@ fmi2Status SemanticAdaptation<T>::fmi2SetupExperiment(fmi2Boolean toleranceDefin
 	fmi2Status status = fmi2OK;
 	for (auto itr = this->instances->begin(), end = this->instances->end(); itr != end; ++itr)
 	{
-		status = (*itr)->fmu->setupExperiment((*itr)->component, toleranceDefined, tolerance, startTime,
-				stopTimeDefined, stopTime);
+		auto comp = (*itr)->component;
+		//prepare state cache
+		this->instanceStates->insert(std::make_pair(comp, std::stack<fmi2FMUstate>()));
+
+		//setup experiment
+		status = (*itr)->fmu->setupExperiment(comp, toleranceDefined, tolerance, startTime, stopTimeDefined, stopTime);
 
 		if (status != fmi2OK)
 		{
@@ -467,10 +533,30 @@ fmi2Status SemanticAdaptation<T>::fmi2ExitInitializationMode()
 template<class T>
 fmi2Status SemanticAdaptation<T>::fmi2Terminate()
 {
+
 	fmi2Status status = fmi2OK;
 	for (auto itr = this->instances->begin(), end = this->instances->end(); itr != end; ++itr)
 	{
-		status = (*itr)->fmu->terminate((*itr)->component);
+		auto comp = (*itr)->component;
+		//release any stored states
+		auto stateItr = this->instanceStates->find(comp);
+		if (stateItr != this->instanceStates->end())
+		{
+			auto states = stateItr->second;
+			while (!states.empty())
+			{
+				auto state = states.top();
+				states.pop();
+				auto res = (*itr)->fmu->freeFMUstate(comp, &state);
+				if (res != fmi2OK)
+				{
+					//TODO report free state error
+				}
+			}
+		}
+
+		// terminate
+		status = (*itr)->fmu->terminate(comp);
 
 		if (status != fmi2OK)
 		{
