@@ -32,7 +32,7 @@ public:
 	{
 		return fabs(a - b);
 	}
-	static int is_close(double a, double b, double REL_TOL, double ABS_TOL)
+	static bool is_close(double a, double b, double REL_TOL, double ABS_TOL)
 	{
 		return ((absoluteError(a, b) < ABS_TOL) && (relativeError(a, b) < REL_TOL));
 	}
