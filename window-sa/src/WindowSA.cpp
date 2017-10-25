@@ -28,15 +28,20 @@
 
 #include "WindowSA.h"
 
-namespace adaptation {
+namespace adaptation
+{
 
-void Window_SA::setFmiValue(fmi2ValueReference id, int value) {
+void Window_SA::setFmiValue(fmi2ValueReference id, int value)
+{
 
 }
-void Window_SA::setFmiValue(fmi2ValueReference id, bool value) {
+void Window_SA::setFmiValue(fmi2ValueReference id, bool value)
+{
 }
-void Window_SA::setFmiValue(fmi2ValueReference id, double value) {
-	switch (id) {
+void Window_SA::setFmiValue(fmi2ValueReference id, double value)
+{
+	switch (id)
+	{
 	case ID_Window_SA_IN_reaction_force:
 		this->reaction_force = value;
 		this->isSetReaction_force = true;
@@ -53,14 +58,18 @@ void Window_SA::setFmiValue(fmi2ValueReference id, double value) {
 
 }
 
-int Window_SA::getFmiValueInteger(fmi2ValueReference id) {
+int Window_SA::getFmiValueInteger(fmi2ValueReference id)
+{
 	return 0;
 }
-bool Window_SA::getFmiValueBoolean(fmi2ValueReference id) {
+bool Window_SA::getFmiValueBoolean(fmi2ValueReference id)
+{
 	return false;
 }
-double Window_SA::getFmiValueReal(fmi2ValueReference id) {
-	switch (id) {
+double Window_SA::getFmiValueReal(fmi2ValueReference id)
+{
+	switch (id)
+	{
 	case ID_Window_SA_OUT_disp:
 		return this->disp;
 		break;
@@ -95,12 +104,14 @@ double Window_SA::getFmiValueReal(fmi2ValueReference id) {
 //	};
 //}
 
-bool Window_SA::in_rule_condition_1() {
+bool Window_SA::in_rule_condition_1()
+{
 //	cout << "executing in in_rule_condition_1"<<endl;
 	return true;
 }
 
-void Window_SA::in_rule_body1() {
+void Window_SA::in_rule_body1()
+{
 //	cout << "executing in in_rule_body1"<<endl;
 //	is_set checks whether the input value is given in the setValues call of the adapted FMU.
 	//		Notice that in the canonical version, all ports are prefixed.
@@ -108,38 +119,45 @@ void Window_SA::in_rule_body1() {
 	if (isSetReaction_force)
 		stored_windowsa_reaction_force = this->reaction_force;
 }
-void Window_SA::in_rule_flush1() {
+void Window_SA::in_rule_flush1()
+{
 //	cout << "executing in in_rule_flush1"<<endl;
 //window.reaction_force = stored_windowsa_reaction_force;
 	setValue(window, 3/*reaction_force*/, stored_windowsa_reaction_force);
 }
 
-bool Window_SA::in_rule_condition_2() {
+bool Window_SA::in_rule_condition_2()
+{
 	return true;
 }
 
-void Window_SA::in_rule_body2() {
+void Window_SA::in_rule_body2()
+{
 //	if (is_set(window_sa.displacement))
 //				stored_windowsa_displacement := window_sa.displacement;
 	if (this->isSetDisplacement)
 		this->stored_windowsa_displacement = this->displacement;
 }
-void Window_SA::in_rule_flush2() {
+void Window_SA::in_rule_flush2()
+{
 //	window.displacement := stored_windowsa_displacement;
 	setValue(window, 1/*displacement*/, this->stored_windowsa_displacement);
 }
 
-bool Window_SA::in_rule_condition_3() {
+bool Window_SA::in_rule_condition_3()
+{
 	return true;
 }
 
-void Window_SA::in_rule_body3() {
+void Window_SA::in_rule_body3()
+{
 //	if (is_set(window_sa.speed))
 //				stored_windowsa_speed := window_sa.speed;
 	if (this->isSetSpeed)
 		this->stored_windowsa_speed = this->speed;
 }
-void Window_SA::in_rule_flush3() {
+void Window_SA::in_rule_flush3()
+{
 //	window.speed := stored_windowsa_speed;
 	setValue(window, 4/*speed*/, this->stored_windowsa_speed);
 }
@@ -181,29 +199,34 @@ shared_ptr<std::list<Rule<Window_SA>>>Window_SA::createInputRules()
 
  */
 
-bool Window_SA::out_rule_condition_1() {
+bool Window_SA::out_rule_condition_1()
+{
 	return true;
 }
 
-void Window_SA::out_rule_body1() {
+void Window_SA::out_rule_body1()
+{
 //	stored_window_reaction_torque := window.reaction_torque;
-	this->stored_window_reaction_torque = getValueDouble(window,
-			5/*reaction_torque*/);
+	this->stored_window_reaction_torque = getValueDouble(window, 5/*reaction_torque*/);
 }
-void Window_SA::out_rule_flush1() {
+void Window_SA::out_rule_flush1()
+{
 //	window_sa.tau := - stored_window_reaction_torque;
 	this->tau = this->stored_window_reaction_torque;
 }
 
-bool Window_SA::out_rule_condition_2() {
+bool Window_SA::out_rule_condition_2()
+{
 	return true;
 }
 
-void Window_SA::out_rule_body2() {
+void Window_SA::out_rule_body2()
+{
 //	stored_window_height := window.height;
 	this->stored_window_height = getValueDouble(window, 0/*height*/);
 }
-void Window_SA::out_rule_flush2() {
+void Window_SA::out_rule_flush2()
+{
 //	window_sa.disp := stored_window_height * 100;
 	this->disp = this->stored_window_height * 100;
 }
@@ -223,32 +246,32 @@ shared_ptr<std::list<Rule<Window_SA>>>Window_SA::createOutputRules()
 	return list;
 }
 
-Window_SA* Window_SA::getRuleThis() {
+Window_SA* Window_SA::getRuleThis()
+{
 	return this;
 }
 
-Window_SA::Window_SA(shared_ptr<std::string> fmiInstanceName,shared_ptr<std::string> resourceLocation,const fmi2CallbackFunctions *functions) :
-		SemanticAdaptation(fmiInstanceName,resourceLocation, createInputRules(),
-				createOutputRules(),functions) {
-	reaction_force = displacement = speed = disp = tau =
-			stored_windowsa_reaction_force = stored_windowsa_displacement =
-					stored_windowsa_speed = stored_window_reaction_torque =
-							stored_window_height = 0;
+Window_SA::Window_SA(shared_ptr<std::string> fmiInstanceName, shared_ptr<std::string> resourceLocation,
+		const fmi2CallbackFunctions *functions) :
+		SemanticAdaptation(fmiInstanceName, resourceLocation, createInputRules(), createOutputRules(), functions)
+{
+	reaction_force = displacement = speed = disp = tau = stored_windowsa_reaction_force = stored_windowsa_displacement =
+			stored_windowsa_speed = stored_window_reaction_torque = stored_window_height = 0;
 
 }
 
-Window_SA::~Window_SA() {
+Window_SA::~Window_SA()
+{
 }
 
-void Window_SA::initialize() {
+void Window_SA::initialize()
+{
 
-	auto spath = Fmu::combinePath(resourceLocation,
-			make_shared<string>("window.fmu"));
+	auto spath = Fmu::combinePath(resourceLocation, make_shared<string>("window.fmu"));
 	auto windowFmu = make_shared<fmi2::Fmu>(*spath);
 	windowFmu->initialize();
-	this->window = windowFmu->instantiate("window", fmi2CoSimulation,
-			"{29e3eae4-7ed5-4ccc-a0e7-7d8198e20bc0}", true, true,
-			shared_from_this());
+	this->window = windowFmu->instantiate("window", fmi2CoSimulation, "{29e3eae4-7ed5-4ccc-a0e7-7d8198e20bc0}", true,
+			true, shared_from_this());
 
 	if (this->window->component == NULL)
 		this->lastErrorState = fmi2Fatal;
@@ -257,8 +280,17 @@ void Window_SA::initialize() {
 
 }
 
-double Window_SA::executeInternalControlFlow(double h, double dt) {
+double Window_SA::executeInternalControlFlow(double h, double dt)
+{
 	return this->do_step(window, h, dt); // includes update_in rules and update_out (update-in rules do not update state)
 }
 
-} /* namespace fmi2 */
+fmi2FMUstate Window_SA::getInternalFMUState()
+{}
+void Window_SA::setInternalFMUState(fmi2FMUstate)
+{}
+void Window_SA::freeInternalFMUState(fmi2FMUstate)
+{}
+
+}
+/* namespace fmi2 */
