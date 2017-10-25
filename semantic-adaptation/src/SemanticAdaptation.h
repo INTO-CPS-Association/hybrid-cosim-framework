@@ -172,8 +172,18 @@ SemanticAdaptation<T>::SemanticAdaptation(shared_ptr<std::string> fmiInstanceNam
 	this->resourceLocation = resourceLocation;
 	this->machineType = Mealy;
 	this->inRules = inRules;
-	cout << "added "<< this->inRules->size() <<endl;
 	this->outRules = outRules;
+
+	if(this->inRules==NULL)
+	{
+		this->inRules = make_shared<std::list<Rule<T>>>();
+	}
+	if(this->outRules==NULL)
+	{
+		this->outRules = make_shared<std::list<Rule<T>>>();
+	}
+
+	cout << "added "<< this->inRules->size() <<endl;
 	this->fmiFunctions = functions;
 
 	this->enablesInRules = make_shared<std::list<Rule<T>>>();
@@ -393,7 +403,7 @@ void SemanticAdaptation<T>::save_state(shared_ptr<FmuComponent> fmuComp)
 		auto itr = this->instanceStates->find(fmuComp->component);
 		if (itr != this->instanceStates->end())
 		{
-			itr.second.push_back(state);
+			itr->second.push_back(state);
 		}
 	}
 }
@@ -404,9 +414,9 @@ void SemanticAdaptation<T>::rollback(shared_ptr<FmuComponent> fmuComp)
 	auto itr = this->instanceStates->find(fmuComp->component);
 	if (itr != this->instanceStates->end())
 	{
-		if (!itr.second.empty())
+		if (!itr->second.empty())
 		{
-			auto state = itr.second.top();
+			auto state = itr->second.back();
 
 			auto status = fmuComp->fmu->setFMUstate(fmuComp->component, state);
 			if (status != fmi2OK)
@@ -421,7 +431,7 @@ void SemanticAdaptation<T>::rollback(shared_ptr<FmuComponent> fmuComp)
 				//TODO handle error for set state
 			}
 
-			itr.second.pop();
+			itr->second.pop_back();
 		}
 	}
 }
