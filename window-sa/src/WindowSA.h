@@ -93,6 +93,10 @@ private:
 
 	double executeInternalControlFlow(double h, double dt);
 
+	 fmi2FMUstate getInternalFMUState();
+	 void setInternalFMUState(fmi2FMUstate);
+	 void freeInternalFMUState(fmi2FMUstate);
+
 	shared_ptr<FmuComponent> window;
 
 	//inputs

@@ -31,6 +31,8 @@
 
 #include <iostream>
 #include <list>
+#include <vector>
+#include <map>
 #include <algorithm>
 #include <math.h>
 #include "Rule.h"
@@ -55,6 +57,12 @@ struct SemanticAdaptationFmiException: public exception
 
 };
 
+struct InternalSemanticAdaptationState
+{
+	fmi2FMUstate internalState;
+	shared_ptr<std::map<fmi2Component, std::vector<fmi2FMUstate>>>instanceStates;
+};
+
 template<class T>
 class SemanticAdaptation: public fmi2::Callback
 {
@@ -70,6 +78,9 @@ public:
 
 	enum MooreOrMealy
 	{	Moore,Mealy};
+
+	enum ReactiveOrDelayed
+	{	Reactive, Delayed};
 
 	fmi2Status flushAllEnabledOutRules();
 
@@ -93,16 +104,28 @@ public:
 	fmi2Status fmi2EnterInitializationMode();
 	fmi2Status fmi2ExitInitializationMode();
 	fmi2Status fmi2Terminate();
+
+	fmi2Status fmi2GetFMUstate (fmi2Component, fmi2FMUstate*);
+	fmi2Status fmi2SetFMUstate (fmi2Component, fmi2FMUstate);
+	fmi2Status fmi2FreeFMUstate (fmi2Component, fmi2FMUstate*);
 	/*FMI Calls END*/
 
 	double getLastSuccessfulTime();
 
 protected:
-	virtual double executeInternalControlFlow(double h, double dt)=0;
+	virtual double executeInternalControlFlow(double h, double dt);
 	double do_step(shared_ptr<FmuComponent>,double t,double H);
+
+	void save_state(shared_ptr<FmuComponent>);
+	void rollback(shared_ptr<FmuComponent>);
+
+	virtual fmi2FMUstate getInternalFMUState()=0;
+	virtual void setInternalFMUState(fmi2FMUstate)=0;
+	virtual void freeInternalFMUState(fmi2FMUstate)=0;
 
 	const fmi2CallbackFunctions *fmiFunctions=NULL;
 	MooreOrMealy machineType;
+	ReactiveOrDelayed reactiveness;
 
 	fmi2Status setValue(shared_ptr<FmuComponent>,fmi2ValueReference id , int value);
 	fmi2Status setValue(shared_ptr<FmuComponent>,fmi2ValueReference id , bool value);
@@ -134,6 +157,11 @@ private:
 
 	double lastSuccessfulTime = 0.0;
 
+	shared_ptr<std::map<fmi2Component,std::vector<fmi2FMUstate>>> instanceStates;
+
+	fmi2Status freeInternalFmuStates(shared_ptr<std::map<fmi2Component,std::vector<fmi2FMUstate>>> instanceStates);
+	shared_ptr<std::map<fmi2Component,std::vector<fmi2FMUstate>>> cloneInstanceStates(shared_ptr<std::map<fmi2Component,std::vector<fmi2FMUstate>>> instanceStates);
+
 };
 
 template<class T>
@@ -144,13 +172,24 @@ SemanticAdaptation<T>::SemanticAdaptation(shared_ptr<std::string> fmiInstanceNam
 	this->resourceLocation = resourceLocation;
 	this->machineType = Mealy;
 	this->inRules = inRules;
-	cout << "added "<< this->inRules->size() <<endl;
 	this->outRules = outRules;
+
+	if(this->inRules==NULL)
+	{
+		this->inRules = make_shared<std::list<Rule<T>>>();
+	}
+	if(this->outRules==NULL)
+	{
+		this->outRules = make_shared<std::list<Rule<T>>>();
+	}
+
+	cout << "added "<< this->inRules->size() <<endl;
 	this->fmiFunctions = functions;
 
 	this->enablesInRules = make_shared<std::list<Rule<T>>>();
 	this->enablesOutRules = make_shared<std::list<Rule<T>>>();
 	this->instances = make_shared<std::list<shared_ptr<FmuComponent>>>();
+	this->instanceStates = make_shared<std::map<fmi2Component,std::vector<fmi2FMUstate>>>();
 
 }
 
@@ -158,6 +197,12 @@ template<class T>
 SemanticAdaptation<T>::~SemanticAdaptation()
 {
 	// TODO Auto-generated destructor stub
+}
+
+template<class T>
+double SemanticAdaptation<T>::executeInternalControlFlow(double h, double dt)
+{
+	return lastSuccessfulTime + h;
 }
 
 template<class T>
@@ -342,6 +387,56 @@ double SemanticAdaptation<T>::do_step(shared_ptr<FmuComponent> fmuComp, double t
 }
 
 template<class T>
+void SemanticAdaptation<T>::save_state(shared_ptr<FmuComponent> fmuComp)
+{
+
+	fmi2FMUstate state;
+
+	auto status = fmuComp->fmu->getFMUstate(fmuComp->component, &state);
+	if (status != fmi2OK)
+	{
+		cerr << "save_state failed: " << status << endl;
+		this->lastErrorState = status;
+		THROW_STATUS_EXCEPTION;
+	} else
+	{
+		auto itr = this->instanceStates->find(fmuComp->component);
+		if (itr != this->instanceStates->end())
+		{
+			itr->second.push_back(state);
+		}
+	}
+}
+
+template<class T>
+void SemanticAdaptation<T>::rollback(shared_ptr<FmuComponent> fmuComp)
+{
+	auto itr = this->instanceStates->find(fmuComp->component);
+	if (itr != this->instanceStates->end())
+	{
+		if (!itr->second.empty())
+		{
+			auto state = itr->second.back();
+
+			auto status = fmuComp->fmu->setFMUstate(fmuComp->component, state);
+			if (status != fmi2OK)
+			{
+				cerr << "rollback failed: " << status << endl;
+				this->lastErrorState = status;
+				THROW_STATUS_EXCEPTION;
+			}
+
+			if (fmuComp->fmu->freeFMUstate(fmuComp->component, &state) != fmi2OK)
+			{
+				//TODO handle error for set state
+			}
+
+			itr->second.pop_back();
+		}
+	}
+}
+
+template<class T>
 int SemanticAdaptation<T>::getValueInteger(shared_ptr<FmuComponent> fmuComp, fmi2ValueReference id)
 {
 	const fmi2ValueReference vr[]
@@ -415,8 +510,12 @@ fmi2Status SemanticAdaptation<T>::fmi2SetupExperiment(fmi2Boolean toleranceDefin
 	fmi2Status status = fmi2OK;
 	for (auto itr = this->instances->begin(), end = this->instances->end(); itr != end; ++itr)
 	{
-		status = (*itr)->fmu->setupExperiment((*itr)->component, toleranceDefined, tolerance, startTime,
-				stopTimeDefined, stopTime);
+		auto comp = (*itr)->component;
+		//prepare state cache
+		this->instanceStates->insert(std::make_pair(comp, std::vector<fmi2FMUstate>()));
+
+		//setup experiment
+		status = (*itr)->fmu->setupExperiment(comp, toleranceDefined, tolerance, startTime, stopTimeDefined, stopTime);
 
 		if (status != fmi2OK)
 		{
@@ -465,12 +564,43 @@ fmi2Status SemanticAdaptation<T>::fmi2ExitInitializationMode()
 }
 
 template<class T>
-fmi2Status SemanticAdaptation<T>::fmi2Terminate()
+fmi2Status SemanticAdaptation<T>::freeInternalFmuStates(shared_ptr<std::map<fmi2Component, std::vector<fmi2FMUstate>>>instanceStates)
 {
 	fmi2Status status = fmi2OK;
 	for (auto itr = this->instances->begin(), end = this->instances->end(); itr != end; ++itr)
 	{
-		status = (*itr)->fmu->terminate((*itr)->component);
+		auto comp = (*itr)->component;
+		//release any stored states
+		auto stateItr = this->instanceStates->find(comp);
+		if (stateItr != this->instanceStates->end())
+		{
+			auto states = stateItr->second;
+			while (!states.empty())
+			{
+				auto state = states.back();
+				states.pop_back();
+				auto res = (*itr)->fmu->freeFMUstate(comp, &state);
+				if (res != fmi2OK)
+				{
+					//TODO report free state error
+					status = res;
+				}
+			}
+		}
+	}
+	return status;
+}
+
+template<class T>
+fmi2Status SemanticAdaptation<T>::fmi2Terminate()
+{
+	fmi2Status status = this->freeInternalFmuStates(this->instanceStates);
+
+	for (auto itr = this->instances->begin(), end = this->instances->end(); itr != end; ++itr)
+	{
+		auto comp = (*itr)->component;
+		// terminate
+		status = (*itr)->fmu->terminate(comp);
 
 		if (status != fmi2OK)
 		{
@@ -480,6 +610,108 @@ fmi2Status SemanticAdaptation<T>::fmi2Terminate()
 
 	}
 	return this->lastErrorState;
+}
+
+template<class T>
+fmi2Status SemanticAdaptation<T>::fmi2GetFMUstate(fmi2Component, fmi2FMUstate* statePtr)
+{
+	InternalSemanticAdaptationState* s = new InternalSemanticAdaptationState();
+	*statePtr = (fmi2FMUstate*) s;
+	s->internalState = this->getInternalFMUState();
+	s->instanceStates = this->cloneInstanceStates(this->instanceStates);
+	return fmi2OK;
+}
+
+template<class T>
+fmi2Status SemanticAdaptation<T>::fmi2SetFMUstate(fmi2Component, fmi2FMUstate state)
+{
+	InternalSemanticAdaptationState* s = (InternalSemanticAdaptationState*) state;
+	this->setInternalFMUState(s->internalState);
+	this->freeInternalFmuStates(this->instanceStates);
+	this->instanceStates = this->cloneInstanceStates(s->instanceStates);
+	return fmi2OK;
+}
+
+template<class T>
+fmi2Status SemanticAdaptation<T>::fmi2FreeFMUstate(fmi2Component, fmi2FMUstate* statePtr)
+{
+	InternalSemanticAdaptationState* s = (InternalSemanticAdaptationState*) *statePtr;
+	this->freeInternalFMUState(s->internalState);
+	this->freeInternalFmuStates(s->instanceStates);
+	return fmi2OK;
+}
+
+template<class T>
+shared_ptr<std::map<fmi2Component, std::vector<fmi2FMUstate>>>SemanticAdaptation<T>::cloneInstanceStates(shared_ptr<std::map<fmi2Component,std::vector<fmi2FMUstate>>> instanceStates)
+{
+	shared_ptr<std::map<fmi2Component,std::vector<fmi2FMUstate>>> stateClone = make_shared<std::map<fmi2Component,std::vector<fmi2FMUstate>>>();;
+
+	for (auto itr = this->instances->begin(), end = this->instances->end(); itr != end; ++itr)
+	{
+		auto comp = (*itr)->component;
+		auto fmu = (*itr)->fmu;
+
+		auto iStates = std::vector<fmi2FMUstate>();
+		stateClone->insert(std::make_pair(comp, iStates));
+
+		auto stateItr = this->instanceStates->find(comp);
+		if (stateItr != this->instanceStates->end())
+		{
+			auto states = stateItr->second;
+
+			//prepare for FMU state cloning
+			fmi2FMUstate currentState;
+			auto status = fmu->getFMUstate(comp, &currentState);
+			if(status !=fmi2OK)
+			{
+				cerr << "cloneInstanceStates failed: for storing current state" << status << endl;
+				this->lastErrorState = status;
+				THROW_STATUS_EXCEPTION;
+			}
+
+			while (!states.empty())
+			{
+				for(auto const& s: states)
+				{
+					status = fmu->setFMUstate(comp, s);
+					if(status !=fmi2OK)
+					{
+						cerr << "cloneInstanceStates failed: for setting the state to clone" << status << endl;
+						this->lastErrorState = status;
+						THROW_STATUS_EXCEPTION;
+					}
+
+					fmi2FMUstate clone;
+					status = fmu->getFMUstate(currentState, &clone);
+					if(status !=fmi2OK)
+					{
+						cerr << "cloneInstanceStates failed: getting the new cloned state of the state to clone" << status << endl;
+						this->lastErrorState = status;
+						THROW_STATUS_EXCEPTION;
+					}
+
+					iStates.push_back(clone);
+				}
+
+			}
+
+			status = fmu->setFMUstate(comp, currentState);
+			if(status !=fmi2OK)
+			{
+				cerr << "cloneInstanceStates failed: to set back original current state" << status << endl;
+				this->lastErrorState = status;
+				THROW_STATUS_EXCEPTION;
+			}
+			status = fmu->freeFMUstate(comp, currentState);
+			if(status !=fmi2OK)
+			{
+				cerr << "cloneInstanceStates failed: to free temp current state used to hold current during cloning" << status << endl;
+				this->lastErrorState = status;
+				THROW_STATUS_EXCEPTION;
+			}
+		}
+	}
+	return stateClone;
 }
 
 template<class T>
