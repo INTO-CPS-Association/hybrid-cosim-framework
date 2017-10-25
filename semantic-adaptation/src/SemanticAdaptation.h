@@ -79,6 +79,9 @@ public:
 	enum MooreOrMealy
 	{	Moore,Mealy};
 
+	enum ReactiveOrDelayed
+	{	Reactive, Delayed};
+
 	fmi2Status flushAllEnabledOutRules();
 
 	fmi2Status getLastErrorState();
@@ -122,6 +125,7 @@ protected:
 
 	const fmi2CallbackFunctions *fmiFunctions=NULL;
 	MooreOrMealy machineType;
+	ReactiveOrDelayed reactiveness;
 
 	fmi2Status setValue(shared_ptr<FmuComponent>,fmi2ValueReference id , int value);
 	fmi2Status setValue(shared_ptr<FmuComponent>,fmi2ValueReference id , bool value);
