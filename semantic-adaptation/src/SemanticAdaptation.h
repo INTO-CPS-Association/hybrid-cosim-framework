@@ -110,7 +110,7 @@ public:
 	double getLastSuccessfulTime();
 
 protected:
-	virtual double executeInternalControlFlow(double h, double dt)=0;
+	virtual double executeInternalControlFlow(double h, double dt);
 	double do_step(shared_ptr<FmuComponent>,double t,double H);
 
 	void save_state(shared_ptr<FmuComponent>);
@@ -183,6 +183,12 @@ template<class T>
 SemanticAdaptation<T>::~SemanticAdaptation()
 {
 	// TODO Auto-generated destructor stub
+}
+
+template<class T>
+double SemanticAdaptation<T>::executeInternalControlFlow(double h, double dt)
+{
+	return lastSuccessfulTime + h;
 }
 
 template<class T>
