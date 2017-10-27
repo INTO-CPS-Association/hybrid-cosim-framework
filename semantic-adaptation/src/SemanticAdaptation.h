@@ -135,7 +135,7 @@ protected:
 	bool getValueBoolean(shared_ptr<FmuComponent>,fmi2ValueReference id );
 	double getValueDouble(shared_ptr<FmuComponent>,fmi2ValueReference id );
 
-	double getMextTimeStep(shared_ptr<FmuComponent>);
+	double getNextTimeStep(shared_ptr<FmuComponent>);
 
 	virtual T* getRuleThis() =0;
 
@@ -740,7 +740,7 @@ void SemanticAdaptation<T>::log(fmi2String instanceName, fmi2Status status, fmi2
 }
 
 template<class T>
-double SemanticAdaptation<T>::getMextTimeStep(shared_ptr<FmuComponent> fmuComp)
+double SemanticAdaptation<T>::getNextTimeStep(shared_ptr<FmuComponent> fmuComp)
 {
 	double time = 0;
 
