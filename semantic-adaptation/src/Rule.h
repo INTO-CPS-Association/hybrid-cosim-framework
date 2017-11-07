@@ -34,9 +34,9 @@
 template<class T>
 struct Rule
 {
-	bool (T::*condition)();
-	void (T::*body)();
-	void (T::*flush)();
+	bool (T::*condition)(double dt, double h);
+	void (T::*body)(double dt, double h);
+	void (T::*flush)(double dt, double h);
 } ;
 
 

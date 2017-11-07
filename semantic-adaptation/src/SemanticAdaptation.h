@@ -61,6 +61,8 @@ struct InternalSemanticAdaptationState
 {
 	fmi2FMUstate internalState;
 	shared_ptr<std::map<fmi2Component, std::vector<fmi2FMUstate>>>instanceStates;
+	double lastDt;
+	double lastH;
 };
 
 template<class T>
@@ -162,6 +164,9 @@ private:
 	fmi2Status freeInternalFmuStates(shared_ptr<std::map<fmi2Component,std::vector<fmi2FMUstate>>> instanceStates);
 	shared_ptr<std::map<fmi2Component,std::vector<fmi2FMUstate>>> cloneInstanceStates(shared_ptr<std::map<fmi2Component,std::vector<fmi2FMUstate>>> instanceStates);
 
+	double lastDt = 0.0;
+	double lastH = 0.0;
+
 };
 
 template<class T>
@@ -171,6 +176,7 @@ SemanticAdaptation<T>::SemanticAdaptation(shared_ptr<std::string> fmiInstanceNam
 	this->fmiInstanceName = fmiInstanceName;
 	this->resourceLocation = resourceLocation;
 	this->machineType = Mealy;
+	this->reactiveness = Reactive;
 	this->inRules = inRules;
 	this->outRules = outRules;
 
@@ -212,12 +218,12 @@ fmi2Status SemanticAdaptation<T>::executeInRules()
 	for (auto itr = this->inRules->begin(), end = this->inRules->end(); itr != end; ++itr)
 	{
 		Rule<T> rule = *itr;
-		if (((*getRuleThis()).*rule.condition)())
+		if (((*getRuleThis()).*rule.condition)(this->lastDt,this->lastH))
 		{
-			((*getRuleThis()).*rule.body)();
+			((*getRuleThis()).*rule.body)(this->lastDt,this->lastH);
 			if (this->machineType == Mealy)
 			{
-				((*getRuleThis()).*rule.flush)();
+				((*getRuleThis()).*rule.flush)(this->lastDt,this->lastH);
 			}
 			this->enablesInRules->push_back(*itr);
 		}
@@ -237,12 +243,12 @@ fmi2Status SemanticAdaptation<T>::executeOutRules()
 	for (auto itr = this->outRules->begin(), end = this->outRules->end(); itr != end; ++itr)
 	{
 		Rule<T> rule = *itr;
-		if (((*getRuleThis()).*rule.condition)())
+		if (((*getRuleThis()).*rule.condition)(this->lastDt,this->lastH))
 		{
-			((*getRuleThis()).*rule.body)();
+			((*getRuleThis()).*rule.body)(this->lastDt,this->lastH);
 			if (this->machineType == Mealy)
 			{
-				((*getRuleThis()).*rule.flush)();
+				((*getRuleThis()).*rule.flush)(this->lastDt,this->lastH);
 			}
 			this->enablesOutRules->push_back(*itr);
 		}
@@ -257,7 +263,7 @@ void SemanticAdaptation<T>::flushAllEnabledInRules()
 	for (auto itr = this->enablesInRules->begin(), end = this->enablesInRules->end(); itr != end; ++itr)
 	{
 		Rule<T> rule = *itr;
-		((*getRuleThis()).*rule.flush)();
+		((*getRuleThis()).*rule.flush)(this->lastDt,this->lastH);
 
 	}
 }
@@ -268,7 +274,7 @@ fmi2Status SemanticAdaptation<T>::flushAllEnabledOutRules()
 	for (auto itr = this->enablesOutRules->begin(), end = this->enablesOutRules->end(); itr != end; ++itr)
 	{
 		Rule<T> rule = *itr;
-		((*getRuleThis()).*rule.flush)();
+		((*getRuleThis()).*rule.flush)(this->lastDt,this->lastH);
 
 	}
 
@@ -381,6 +387,16 @@ double SemanticAdaptation<T>::do_step(shared_ptr<FmuComponent> fmuComp, double t
 		{
 			THROW_STATUS_EXCEPTION;
 		}
+	}
+
+	this->lastDt = t;
+	this->lastH = H;
+	status = this->executeOutRules();
+	if (status != fmi2OK)
+	{
+		cerr << "do_step-executeOutRiles failed: t: " << t << " h: " << H << " " << status << endl;
+		this->lastErrorState = status;
+		THROW_STATUS_EXCEPTION;
 	}
 
 	return H;
@@ -619,6 +635,8 @@ fmi2Status SemanticAdaptation<T>::fmi2GetFMUstate(fmi2Component, fmi2FMUstate* s
 	*statePtr = (fmi2FMUstate*) s;
 	s->internalState = this->getInternalFMUState();
 	s->instanceStates = this->cloneInstanceStates(this->instanceStates);
+	s->lastDt = this->lastDt;
+	s->lastH = this->lastH;
 	return fmi2OK;
 }
 
@@ -629,6 +647,8 @@ fmi2Status SemanticAdaptation<T>::fmi2SetFMUstate(fmi2Component, fmi2FMUstate st
 	this->setInternalFMUState(s->internalState);
 	this->freeInternalFmuStates(this->instanceStates);
 	this->instanceStates = this->cloneInstanceStates(s->instanceStates);
+	this->lastDt = s->lastDt;
+	this->lastH = s->lastH;
 	return fmi2OK;
 }
 
