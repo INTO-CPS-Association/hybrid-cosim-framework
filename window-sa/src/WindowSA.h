@@ -70,26 +70,26 @@ private:
 	shared_ptr<std::list<Rule<Window_SA>>> createOutputRules();
 
 	/*in rules*/
-	bool in_rule_condition_1();
-	void in_rule_body1();
-	void in_rule_flush1();
+	bool in_rule_condition_1(double dt, double h);
+	void in_rule_body1(double dt, double h);
+	void in_rule_flush1(double dt, double h);
 
-	bool in_rule_condition_2();
-	void in_rule_body2();
-	void in_rule_flush2();
+	bool in_rule_condition_2(double dt, double h);
+	void in_rule_body2(double dt, double h);
+	void in_rule_flush2(double dt, double h);
 
-	bool in_rule_condition_3();
-	void in_rule_body3();
-	void in_rule_flush3();
+	bool in_rule_condition_3(double dt, double h);
+	void in_rule_body3(double dt, double h);
+	void in_rule_flush3(double dt, double h);
 
 	/*out rules*/
-	bool out_rule_condition_1();
-	void out_rule_body1();
-	void out_rule_flush1();
+	bool out_rule_condition_1(double dt, double h);
+	void out_rule_body1(double dt, double h);
+	void out_rule_flush1(double dt, double h);
 
-	bool out_rule_condition_2();
-	void out_rule_body2();
-	void out_rule_flush2();
+	bool out_rule_condition_2(double dt, double h);
+	void out_rule_body2(double dt, double h);
+	void out_rule_flush2(double dt, double h);
 
 	double executeInternalControlFlow(double h, double dt);
 

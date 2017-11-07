@@ -104,13 +104,13 @@ double Window_SA::getFmiValueReal(fmi2ValueReference id)
 //	};
 //}
 
-bool Window_SA::in_rule_condition_1()
+bool Window_SA::in_rule_condition_1(double dt, double h)
 {
 //	cout << "executing in in_rule_condition_1"<<endl;
 	return true;
 }
 
-void Window_SA::in_rule_body1()
+void Window_SA::in_rule_body1(double dt, double h)
 {
 //	cout << "executing in in_rule_body1"<<endl;
 //	is_set checks whether the input value is given in the setValues call of the adapted FMU.
@@ -119,44 +119,44 @@ void Window_SA::in_rule_body1()
 	if (isSetReaction_force)
 		stored_windowsa_reaction_force = this->reaction_force;
 }
-void Window_SA::in_rule_flush1()
+void Window_SA::in_rule_flush1(double dt, double h)
 {
 //	cout << "executing in in_rule_flush1"<<endl;
 //window.reaction_force = stored_windowsa_reaction_force;
 	setValue(window, 3/*reaction_force*/, stored_windowsa_reaction_force);
 }
 
-bool Window_SA::in_rule_condition_2()
+bool Window_SA::in_rule_condition_2(double dt, double h)
 {
 	return true;
 }
 
-void Window_SA::in_rule_body2()
+void Window_SA::in_rule_body2(double dt, double h)
 {
 //	if (is_set(window_sa.displacement))
 //				stored_windowsa_displacement := window_sa.displacement;
 	if (this->isSetDisplacement)
 		this->stored_windowsa_displacement = this->displacement;
 }
-void Window_SA::in_rule_flush2()
+void Window_SA::in_rule_flush2(double dt, double h)
 {
 //	window.displacement := stored_windowsa_displacement;
 	setValue(window, 1/*displacement*/, this->stored_windowsa_displacement);
 }
 
-bool Window_SA::in_rule_condition_3()
+bool Window_SA::in_rule_condition_3(double dt, double h)
 {
 	return true;
 }
 
-void Window_SA::in_rule_body3()
+void Window_SA::in_rule_body3(double dt, double h)
 {
 //	if (is_set(window_sa.speed))
 //				stored_windowsa_speed := window_sa.speed;
 	if (this->isSetSpeed)
 		this->stored_windowsa_speed = this->speed;
 }
-void Window_SA::in_rule_flush3()
+void Window_SA::in_rule_flush3(double dt, double h)
 {
 //	window.speed := stored_windowsa_speed;
 	setValue(window, 4/*speed*/, this->stored_windowsa_speed);
@@ -199,33 +199,33 @@ shared_ptr<std::list<Rule<Window_SA>>>Window_SA::createInputRules()
 
  */
 
-bool Window_SA::out_rule_condition_1()
+bool Window_SA::out_rule_condition_1(double dt, double h)
 {
 	return true;
 }
 
-void Window_SA::out_rule_body1()
+void Window_SA::out_rule_body1(double dt, double h)
 {
 //	stored_window_reaction_torque := window.reaction_torque;
 	this->stored_window_reaction_torque = getValueDouble(window, 5/*reaction_torque*/);
 }
-void Window_SA::out_rule_flush1()
+void Window_SA::out_rule_flush1(double dt, double h)
 {
 //	window_sa.tau := - stored_window_reaction_torque;
 	this->tau = this->stored_window_reaction_torque;
 }
 
-bool Window_SA::out_rule_condition_2()
+bool Window_SA::out_rule_condition_2(double dt, double h)
 {
 	return true;
 }
 
-void Window_SA::out_rule_body2()
+void Window_SA::out_rule_body2(double dt, double h)
 {
 //	stored_window_height := window.height;
 	this->stored_window_height = getValueDouble(window, 0/*height*/);
 }
-void Window_SA::out_rule_flush2()
+void Window_SA::out_rule_flush2(double dt, double h)
 {
 //	window_sa.disp := stored_window_height * 100;
 	this->disp = this->stored_window_height * 100;
