@@ -658,6 +658,7 @@ fmi2Status SemanticAdaptation<T>::fmi2FreeFMUstate(fmi2Component, fmi2FMUstate* 
 	InternalSemanticAdaptationState* s = (InternalSemanticAdaptationState*) *statePtr;
 	this->freeInternalFMUState(s->internalState);
 	this->freeInternalFmuStates(s->instanceStates);
+	*statePtr=NULL;
 	return fmi2OK;
 }
 
@@ -680,7 +681,7 @@ shared_ptr<std::map<fmi2Component, std::vector<fmi2FMUstate>>>SemanticAdaptation
 			auto states = stateItr->second;
 
 			//prepare for FMU state cloning
-			fmi2FMUstate currentState;
+			fmi2FMUstate currentState=NULL;
 			auto status = fmu->getFMUstate(comp, &currentState);
 			if(status !=fmi2OK)
 			{
@@ -701,8 +702,8 @@ shared_ptr<std::map<fmi2Component, std::vector<fmi2FMUstate>>>SemanticAdaptation
 						THROW_STATUS_EXCEPTION;
 					}
 
-					fmi2FMUstate clone;
-					status = fmu->getFMUstate(currentState, &clone);
+					fmi2FMUstate clone=NULL;
+					status = fmu->getFMUstate(comp, &clone);
 					if(status !=fmi2OK)
 					{
 						cerr << "cloneInstanceStates failed: getting the new cloned state of the state to clone" << status << endl;
@@ -722,7 +723,7 @@ shared_ptr<std::map<fmi2Component, std::vector<fmi2FMUstate>>>SemanticAdaptation
 				this->lastErrorState = status;
 				THROW_STATUS_EXCEPTION;
 			}
-			status = fmu->freeFMUstate(comp, currentState);
+			status = fmu->freeFMUstate(comp, &currentState);
 			if(status !=fmi2OK)
 			{
 				cerr << "cloneInstanceStates failed: to free temp current state used to hold current during cloning" << status << endl;
