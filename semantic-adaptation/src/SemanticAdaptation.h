@@ -115,7 +115,7 @@ public:
 	double getLastSuccessfulTime();
 
 protected:
-	virtual double executeInternalControlFlow(double h, double dt);
+	virtual double executeInternalControlFlow(double t, double H);
 	double do_step(shared_ptr<FmuComponent>,double t,double H);
 
 	void save_state(shared_ptr<FmuComponent>);
@@ -206,9 +206,9 @@ SemanticAdaptation<T>::~SemanticAdaptation()
 }
 
 template<class T>
-double SemanticAdaptation<T>::executeInternalControlFlow(double h, double dt)
+double SemanticAdaptation<T>::executeInternalControlFlow(double t, double H)
 {
-	return lastSuccessfulTime + h;
+	return lastSuccessfulTime + H;
 }
 
 template<class T>
@@ -288,14 +288,14 @@ double SemanticAdaptation<T>::getLastSuccessfulTime()
 }
 
 template<class T>
-fmi2Status SemanticAdaptation<T>::executeControlFlow(double h, double dt)
+fmi2Status SemanticAdaptation<T>::executeControlFlow(double t, double H)
 {
 	this->enablesOutRules->clear();
 
 	//flush all enabled in-rules
 	flushAllEnabledInRules();
 
-	lastSuccessfulTime = executeInternalControlFlow(h, dt);
+	lastSuccessfulTime = executeInternalControlFlow(t, H);
 
 	//execute the body of all out-rules with a true condition and enable them
 	executeOutRules();
