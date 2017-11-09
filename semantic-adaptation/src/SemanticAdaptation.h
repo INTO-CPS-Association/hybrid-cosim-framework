@@ -218,12 +218,12 @@ fmi2Status SemanticAdaptation<T>::executeInRules()
 	for (auto itr = this->inRules->begin(), end = this->inRules->end(); itr != end; ++itr)
 	{
 		Rule<T> rule = *itr;
-		if (((*getRuleThis()).*rule.condition)(this->lastDt,this->lastH))
+		if (((*getRuleThis()).*rule.condition)(this->lastDt, this->lastH))
 		{
-			((*getRuleThis()).*rule.body)(this->lastDt,this->lastH);
+			((*getRuleThis()).*rule.body)(this->lastDt, this->lastH);
 			if (this->machineType == Mealy)
 			{
-				((*getRuleThis()).*rule.flush)(this->lastDt,this->lastH);
+				((*getRuleThis()).*rule.flush)(this->lastDt, this->lastH);
 			}
 			this->enablesInRules->push_back(*itr);
 		}
@@ -243,12 +243,12 @@ fmi2Status SemanticAdaptation<T>::executeOutRules()
 	for (auto itr = this->outRules->begin(), end = this->outRules->end(); itr != end; ++itr)
 	{
 		Rule<T> rule = *itr;
-		if (((*getRuleThis()).*rule.condition)(this->lastDt,this->lastH))
+		if (((*getRuleThis()).*rule.condition)(this->lastDt, this->lastH))
 		{
-			((*getRuleThis()).*rule.body)(this->lastDt,this->lastH);
+			((*getRuleThis()).*rule.body)(this->lastDt, this->lastH);
 			if (this->machineType == Mealy)
 			{
-				((*getRuleThis()).*rule.flush)(this->lastDt,this->lastH);
+				((*getRuleThis()).*rule.flush)(this->lastDt, this->lastH);
 			}
 			this->enablesOutRules->push_back(*itr);
 		}
@@ -263,7 +263,7 @@ void SemanticAdaptation<T>::flushAllEnabledInRules()
 	for (auto itr = this->enablesInRules->begin(), end = this->enablesInRules->end(); itr != end; ++itr)
 	{
 		Rule<T> rule = *itr;
-		((*getRuleThis()).*rule.flush)(this->lastDt,this->lastH);
+		((*getRuleThis()).*rule.flush)(this->lastDt, this->lastH);
 
 	}
 }
@@ -274,7 +274,7 @@ fmi2Status SemanticAdaptation<T>::flushAllEnabledOutRules()
 	for (auto itr = this->enablesOutRules->begin(), end = this->enablesOutRules->end(); itr != end; ++itr)
 	{
 		Rule<T> rule = *itr;
-		((*getRuleThis()).*rule.flush)(this->lastDt,this->lastH);
+		((*getRuleThis()).*rule.flush)(this->lastDt, this->lastH);
 
 	}
 
@@ -450,7 +450,7 @@ void SemanticAdaptation<T>::rollback(shared_ptr<FmuComponent> fmuComp)
 			auto state = itr->second.back();
 
 #ifdef SA_DEBUG
-	printf("Calling setFMUStater on %s,%p\n",fmuComp->fmu->getPath()->c_str(),fmuComp->component);
+			printf("Calling setFMUStater on %s,%p\n",fmuComp->fmu->getPath()->c_str(),fmuComp->component);
 #endif
 			auto status = fmuComp->fmu->setFMUstate(fmuComp->component, state);
 			if (status != fmi2OK)
@@ -461,7 +461,7 @@ void SemanticAdaptation<T>::rollback(shared_ptr<FmuComponent> fmuComp)
 			}
 
 #ifdef SA_DEBUG
-	printf("Calling freeFMUStater on %s,%p\n",fmuComp->fmu->getPath()->c_str(),fmuComp->component);
+			printf("Calling freeFMUStater on %s,%p\n",fmuComp->fmu->getPath()->c_str(),fmuComp->component);
 #endif
 			if (fmuComp->fmu->freeFMUstate(fmuComp->component, &state) != fmi2OK)
 			{
@@ -626,7 +626,7 @@ fmi2Status SemanticAdaptation<T>::freeInternalFmuStates(shared_ptr<std::map<fmi2
 				auto state = states.back();
 				states.pop_back();
 #ifdef SA_DEBUG
-	printf("Calling freeFMUState on %s,%p\n","?",comp);
+				printf("Calling freeFMUState on %s,%p\n","?",comp);
 #endif
 				auto res = (*itr)->fmu->freeFMUstate(comp, &state);
 				if (res != fmi2OK)
@@ -667,7 +667,17 @@ fmi2Status SemanticAdaptation<T>::fmi2GetFMUstate(fmi2Component, fmi2FMUstate* s
 	InternalSemanticAdaptationState* s = new InternalSemanticAdaptationState();
 	*statePtr = (fmi2FMUstate*) s;
 	s->internalState = this->getInternalFMUState();
+	//sore current state
+	for (auto itr = this->instances->begin(), end = this->instances->end(); itr != end; ++itr)
+	{
+		this->save_state(*itr);
+	}
 	s->instanceStates = this->cloneInstanceStates(this->instanceStates);
+	//pop the extra state so the instance is set back to original pre-getstate state for this state
+	for (auto itr = this->instances->begin(), end = this->instances->end(); itr != end; ++itr)
+	{
+		this->rollback(*itr);
+	}
 	s->lastDt = this->lastDt;
 	s->lastH = this->lastH;
 	return fmi2OK;
@@ -680,6 +690,11 @@ fmi2Status SemanticAdaptation<T>::fmi2SetFMUstate(fmi2Component, fmi2FMUstate st
 	this->setInternalFMUState(s->internalState);
 	this->freeInternalFmuStates(this->instanceStates);
 	this->instanceStates = this->cloneInstanceStates(s->instanceStates);
+	//pop the extra state so the instance is set back to original pre-getstate state
+	for (auto itr = this->instances->begin(), end = this->instances->end(); itr != end; ++itr)
+	{
+		this->rollback(*itr);
+	}
 	this->lastDt = s->lastDt;
 	this->lastH = s->lastH;
 	return fmi2OK;
@@ -691,7 +706,7 @@ fmi2Status SemanticAdaptation<T>::fmi2FreeFMUstate(fmi2Component, fmi2FMUstate* 
 	InternalSemanticAdaptationState* s = (InternalSemanticAdaptationState*) *statePtr;
 	this->freeInternalFMUState(s->internalState);
 	this->freeInternalFmuStates(s->instanceStates);
-	*statePtr=NULL;
+	*statePtr = NULL;
 	return fmi2OK;
 }
 
@@ -713,18 +728,19 @@ shared_ptr<std::map<fmi2Component, std::vector<fmi2FMUstate>>>SemanticAdaptation
 		{
 			auto states = stateItr->second;
 
-			//prepare for FMU state cloning
-			fmi2FMUstate currentState=NULL;
-			auto status = fmu->getFMUstate(comp, &currentState);
-			if(status !=fmi2OK)
+			if (!states.empty())
 			{
-				cerr << "cloneInstanceStates failed: for storing current state" << status << endl;
-				this->lastErrorState = status;
-				THROW_STATUS_EXCEPTION;
-			}
 
-			while (!states.empty())
-			{
+				//prepare for FMU state cloning
+				fmi2FMUstate currentState=NULL;
+				auto status = fmu->getFMUstate(comp, &currentState);
+				if(status !=fmi2OK)
+				{
+					cerr << "cloneInstanceStates failed: for storing current state" << status << endl;
+					this->lastErrorState = status;
+					THROW_STATUS_EXCEPTION;
+				}
+
 				for(auto const& s: states)
 				{
 					status = fmu->setFMUstate(comp, s);
@@ -747,21 +763,20 @@ shared_ptr<std::map<fmi2Component, std::vector<fmi2FMUstate>>>SemanticAdaptation
 					iStates.push_back(clone);
 				}
 
-			}
-
-			status = fmu->setFMUstate(comp, currentState);
-			if(status !=fmi2OK)
-			{
-				cerr << "cloneInstanceStates failed: to set back original current state" << status << endl;
-				this->lastErrorState = status;
-				THROW_STATUS_EXCEPTION;
-			}
-			status = fmu->freeFMUstate(comp, &currentState);
-			if(status !=fmi2OK)
-			{
-				cerr << "cloneInstanceStates failed: to free temp current state used to hold current during cloning" << status << endl;
-				this->lastErrorState = status;
-				THROW_STATUS_EXCEPTION;
+				status = fmu->setFMUstate(comp, currentState);
+				if(status !=fmi2OK)
+				{
+					cerr << "cloneInstanceStates failed: to set back original current state" << status << endl;
+					this->lastErrorState = status;
+					THROW_STATUS_EXCEPTION;
+				}
+				status = fmu->freeFMUstate(comp, &currentState);
+				if(status !=fmi2OK)
+				{
+					cerr << "cloneInstanceStates failed: to free temp current state used to hold current during cloning" << status << endl;
+					this->lastErrorState = status;
+					THROW_STATUS_EXCEPTION;
+				}
 			}
 		}
 	}
