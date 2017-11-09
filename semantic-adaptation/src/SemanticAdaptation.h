@@ -626,7 +626,7 @@ fmi2Status SemanticAdaptation<T>::freeInternalFmuStates(shared_ptr<std::map<fmi2
 				auto state = states.back();
 				states.pop_back();
 #ifdef SA_DEBUG
-	printf("Calling freeFMUState on %s,%p\n","?",fmuComp->component);
+	printf("Calling freeFMUState on %s,%p\n","?",comp);
 #endif
 				auto res = (*itr)->fmu->freeFMUstate(comp, &state);
 				if (res != fmi2OK)
