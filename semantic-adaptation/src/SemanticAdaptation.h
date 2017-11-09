@@ -314,7 +314,7 @@ fmi2Status SemanticAdaptation<T>::setValue(shared_ptr<FmuComponent> fmuComp, fmi
 	{ value };
 
 #ifdef SA_DEBUG
-	printf("Calling setInteger on %s,%p, id=%d, value=%d\n","?",fmuComp->component,id,value);
+	printf("Calling setInteger on %s,%p, id=%d, value=%d\n",fmuComp->fmu->getPath()->c_str(),fmuComp->component,id,value);
 #endif
 	fmi2Status status = fmuComp->fmu->setInteger(fmuComp->component, vr, nvr, v);
 	if (status != fmi2OK)
@@ -336,7 +336,7 @@ fmi2Status SemanticAdaptation<T>::setValue(shared_ptr<FmuComponent> fmuComp, fmi
 	{ value };
 
 #ifdef SA_DEBUG
-	printf("Calling setBoolean on %s,%p, id=%d, value=%d\n","?",fmuComp->component,id,value);
+	printf("Calling setBoolean on %s,%p, id=%d, value=%d\n",fmuComp->fmu->getPath()->c_str(),fmuComp->component,id,value);
 #endif
 	fmi2Status status = fmuComp->fmu->setBoolean(fmuComp->component, vr, nvr, v);
 	if (status != fmi2OK)
@@ -358,7 +358,7 @@ fmi2Status SemanticAdaptation<T>::setValue(shared_ptr<FmuComponent> fmuComp, fmi
 	{ value };
 
 #ifdef SA_DEBUG
-	printf("Calling setReal on %s,%p, id=%d, value=%f\n","?",fmuComp->component,id,value);
+	printf("Calling setReal on %s,%p, id=%d, value=%f\n",fmuComp->fmu->getPath()->c_str(),fmuComp->component,id,value);
 #endif
 	fmi2Status status = fmuComp->fmu->setReal(fmuComp->component, vr, nvr, v);
 	if (status != fmi2OK)
@@ -375,7 +375,7 @@ template<class T>
 double SemanticAdaptation<T>::do_step(shared_ptr<FmuComponent> fmuComp, double t, double H)
 {
 #ifdef SA_DEBUG
-	printf("Calling doStep on %s,%p, comminicationPoint=%f, stepsize=%f\n","?",fmuComp->component,t,H);
+	printf("Calling doStep on %s,%p, comminicationPoint=%f, stepsize=%f\n",fmuComp->fmu->getPath()->c_str(),fmuComp->component,t,H);
 #endif
 	fmi2Status status = fmuComp->fmu->doStep(fmuComp->component, t, H, false);
 	if (status != fmi2OK)
@@ -421,7 +421,7 @@ void SemanticAdaptation<T>::save_state(shared_ptr<FmuComponent> fmuComp)
 	fmi2FMUstate state;
 
 #ifdef SA_DEBUG
-	printf("Calling getFMUStater on %s,%p\n","?",fmuComp->component);
+	printf("Calling getFMUStater on %s,%p\n",fmuComp->fmu->getPath()->c_str(),fmuComp->component);
 #endif
 	auto status = fmuComp->fmu->getFMUstate(fmuComp->component, &state);
 	if (status != fmi2OK)
@@ -450,7 +450,7 @@ void SemanticAdaptation<T>::rollback(shared_ptr<FmuComponent> fmuComp)
 			auto state = itr->second.back();
 
 #ifdef SA_DEBUG
-	printf("Calling setFMUStater on %s,%p\n","?",fmuComp->component);
+	printf("Calling setFMUStater on %s,%p\n",fmuComp->fmu->getPath()->c_str(),fmuComp->component);
 #endif
 			auto status = fmuComp->fmu->setFMUstate(fmuComp->component, state);
 			if (status != fmi2OK)
@@ -461,7 +461,7 @@ void SemanticAdaptation<T>::rollback(shared_ptr<FmuComponent> fmuComp)
 			}
 
 #ifdef SA_DEBUG
-	printf("Calling freeFMUStater on %s,%p\n","?",fmuComp->component);
+	printf("Calling freeFMUStater on %s,%p\n",fmuComp->fmu->getPath()->c_str(),fmuComp->component);
 #endif
 			if (fmuComp->fmu->freeFMUstate(fmuComp->component, &state) != fmi2OK)
 			{
@@ -482,7 +482,7 @@ int SemanticAdaptation<T>::getValueInteger(shared_ptr<FmuComponent> fmuComp, fmi
 	fmi2Integer v[1];
 
 #ifdef SA_DEBUG
-	printf("Calling getInteger on %s,%p id = %d\n","?",fmuComp->component,id);
+	printf("Calling getInteger on %s,%p id = %d\n",fmuComp->fmu->getPath()->c_str(),fmuComp->component,id);
 #endif
 	fmi2Status status = fmuComp->fmu->getInteger(fmuComp->component, vr, nvr, v);
 	if (status != fmi2OK)
@@ -503,7 +503,7 @@ bool SemanticAdaptation<T>::getValueBoolean(shared_ptr<FmuComponent> fmuComp, fm
 	fmi2Boolean v[1];
 
 #ifdef SA_DEBUG
-	printf("Calling getBoolean on %s,%p id = %d\n","?",fmuComp->component,id);
+	printf("Calling getBoolean on %s,%p id = %d\n",fmuComp->fmu->getPath()->c_str(),fmuComp->component,id);
 #endif
 	fmi2Status status = fmuComp->fmu->getBoolean(fmuComp->component, vr, nvr, v);
 	if (status != fmi2OK)
@@ -524,7 +524,7 @@ double SemanticAdaptation<T>::getValueDouble(shared_ptr<FmuComponent> fmuComp, f
 	fmi2Real v[1];
 
 #ifdef SA_DEBUG
-	printf("Calling getDouble on %s,%p id = %d\n","?",fmuComp->component,id);
+	printf("Calling getDouble on %s,%p id = %d\n",fmuComp->fmu->getPath()->c_str(),fmuComp->component,id);
 #endif
 	fmi2Status status = fmuComp->fmu->getReal(fmuComp->component, vr, nvr, v);
 	if (status != fmi2OK)
