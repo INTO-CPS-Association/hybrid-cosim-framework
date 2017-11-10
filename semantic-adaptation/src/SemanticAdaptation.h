@@ -76,7 +76,7 @@ public:
 
 	virtual fmi2Status executeControlFlow(double h, double dt) final;
 	fmi2Status executeInRules();
-	fmi2Status executeOutRules();
+	fmi2Status executeOutRules(bool ignoreEnabledCheck = false);
 
 	enum MooreOrMealy
 	{	Moore,Mealy};
@@ -224,6 +224,7 @@ fmi2Status SemanticAdaptation<T>::executeInRules()
 			if (this->machineType == Mealy)
 			{
 				((*getRuleThis()).*rule.flush)(this->lastDt, this->lastH);
+				this->executeOutRules(true);
 			}
 			this->enablesInRules->push_back(*itr);
 		}
@@ -232,9 +233,9 @@ fmi2Status SemanticAdaptation<T>::executeInRules()
 }
 
 template<class T>
-fmi2Status SemanticAdaptation<T>::executeOutRules()
+fmi2Status SemanticAdaptation<T>::executeOutRules(bool ignoreEnabledCheck )
 {
-	if (this->enablesOutRules->size() > 0)
+	if (this->enablesOutRules->size() > 0 && !ignoreEnabledCheck)
 	{
 		//not sure why
 		return fmi2OK;
