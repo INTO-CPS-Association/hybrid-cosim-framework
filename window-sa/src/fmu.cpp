@@ -280,15 +280,15 @@ extern "C" fmi2Status fmi2SetString(fmi2Component c, const fmi2ValueReference vr
 
 extern "C" fmi2Status fmi2GetFMUstate(fmi2Component c, fmi2FMUstate* FMUstate)
 {
-	return fmi2OK;
+	return g_adaptation->fmi2GetFMUstate(FMUstate);
 }
 extern "C" fmi2Status fmi2SetFMUstate(fmi2Component c, fmi2FMUstate FMUstate)
 {
-	return fmi2OK;
+	return g_adaptation->fmi2SetFMUstate(FMUstate);
 }
 extern "C" fmi2Status fmi2FreeFMUstate(fmi2Component c, fmi2FMUstate* FMUstate)
 {
-	return fmi2OK;
+	return g_adaptation->fmi2FreeFMUstate(FMUstate);
 }
 
 extern "C" fmi2Status fmi2SerializedFMUstateSize(fmi2Component c, fmi2FMUstate FMUstate, size_t *size)

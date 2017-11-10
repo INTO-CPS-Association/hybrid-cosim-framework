@@ -107,9 +107,9 @@ public:
 	fmi2Status fmi2ExitInitializationMode();
 	fmi2Status fmi2Terminate();
 
-	fmi2Status fmi2GetFMUstate (fmi2Component, fmi2FMUstate*);
-	fmi2Status fmi2SetFMUstate (fmi2Component, fmi2FMUstate);
-	fmi2Status fmi2FreeFMUstate (fmi2Component, fmi2FMUstate*);
+	fmi2Status fmi2GetFMUstate ( fmi2FMUstate*);
+	fmi2Status fmi2SetFMUstate ( fmi2FMUstate);
+	fmi2Status fmi2FreeFMUstate (fmi2FMUstate*);
 	/*FMI Calls END*/
 
 	double getLastSuccessfulTime();
@@ -233,7 +233,7 @@ fmi2Status SemanticAdaptation<T>::executeInRules()
 }
 
 template<class T>
-fmi2Status SemanticAdaptation<T>::executeOutRules(bool ignoreEnabledCheck )
+fmi2Status SemanticAdaptation<T>::executeOutRules(bool ignoreEnabledCheck)
 {
 	if (this->enablesOutRules->size() > 0 && !ignoreEnabledCheck)
 	{
@@ -663,7 +663,7 @@ fmi2Status SemanticAdaptation<T>::fmi2Terminate()
 }
 
 template<class T>
-fmi2Status SemanticAdaptation<T>::fmi2GetFMUstate(fmi2Component, fmi2FMUstate* statePtr)
+fmi2Status SemanticAdaptation<T>::fmi2GetFMUstate(fmi2FMUstate* statePtr)
 {
 	InternalSemanticAdaptationState* s = new InternalSemanticAdaptationState();
 	*statePtr = (fmi2FMUstate*) s;
@@ -685,9 +685,9 @@ fmi2Status SemanticAdaptation<T>::fmi2GetFMUstate(fmi2Component, fmi2FMUstate* s
 }
 
 template<class T>
-fmi2Status SemanticAdaptation<T>::fmi2SetFMUstate(fmi2Component, fmi2FMUstate state)
+fmi2Status SemanticAdaptation<T>::fmi2SetFMUstate(fmi2FMUstate state)
 {
-	if(state==NULL)
+	if (state == NULL)
 		return fmi2Error;
 
 	InternalSemanticAdaptationState* s = (InternalSemanticAdaptationState*) state;
@@ -705,9 +705,9 @@ fmi2Status SemanticAdaptation<T>::fmi2SetFMUstate(fmi2Component, fmi2FMUstate st
 }
 
 template<class T>
-fmi2Status SemanticAdaptation<T>::fmi2FreeFMUstate(fmi2Component, fmi2FMUstate* statePtr)
+fmi2Status SemanticAdaptation<T>::fmi2FreeFMUstate(fmi2FMUstate* statePtr)
 {
-	if(statePtr==NULL || NULL==*statePtr)
+	if (statePtr == NULL || NULL == *statePtr)
 		return fmi2Error;
 	InternalSemanticAdaptationState* s = (InternalSemanticAdaptationState*) *statePtr;
 	this->freeInternalFMUState(s->internalState);
@@ -727,7 +727,6 @@ shared_ptr<std::map<fmi2Component, std::vector<fmi2FMUstate>>>SemanticAdaptation
 		auto fmu = (*itr)->fmu;
 
 		auto iStates = std::vector<fmi2FMUstate>();
-		stateClone->insert(std::make_pair(comp, iStates));
 
 		auto stateItr = this->instanceStates->find(comp);
 		if (stateItr != this->instanceStates->end())
@@ -736,7 +735,6 @@ shared_ptr<std::map<fmi2Component, std::vector<fmi2FMUstate>>>SemanticAdaptation
 
 			if (!states.empty())
 			{
-
 				//prepare for FMU state cloning
 				fmi2FMUstate currentState=NULL;
 				auto status = fmu->getFMUstate(comp, &currentState);
@@ -785,6 +783,7 @@ shared_ptr<std::map<fmi2Component, std::vector<fmi2FMUstate>>>SemanticAdaptation
 				}
 			}
 		}
+		stateClone->insert(std::make_pair(comp, iStates));
 	}
 	return stateClone;
 }
