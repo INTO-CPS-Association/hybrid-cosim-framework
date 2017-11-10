@@ -686,6 +686,9 @@ fmi2Status SemanticAdaptation<T>::fmi2GetFMUstate(fmi2Component, fmi2FMUstate* s
 template<class T>
 fmi2Status SemanticAdaptation<T>::fmi2SetFMUstate(fmi2Component, fmi2FMUstate state)
 {
+	if(state==NULL)
+		return fmi2Error;
+
 	InternalSemanticAdaptationState* s = (InternalSemanticAdaptationState*) state;
 	this->setInternalFMUState(s->internalState);
 	this->freeInternalFmuStates(this->instanceStates);
@@ -703,6 +706,8 @@ fmi2Status SemanticAdaptation<T>::fmi2SetFMUstate(fmi2Component, fmi2FMUstate st
 template<class T>
 fmi2Status SemanticAdaptation<T>::fmi2FreeFMUstate(fmi2Component, fmi2FMUstate* statePtr)
 {
+	if(statePtr==NULL || NULL==*statePtr)
+		return fmi2Error;
 	InternalSemanticAdaptationState* s = (InternalSemanticAdaptationState*) *statePtr;
 	this->freeInternalFMUState(s->internalState);
 	this->freeInternalFmuStates(s->instanceStates);
