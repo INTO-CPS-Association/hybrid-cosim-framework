@@ -24,7 +24,7 @@ Now each project can be build using make.
 To import into eclipse use eclipse CDT and select 
 file -> import -> Existing Code as Makefile Project
 
-#Overview
-The image below shows how the components are connected
+# Overview
+The image below shows how the components are connected.
 ![C++ Component connections](notes/hybridCosimulation-framework.png)
  
