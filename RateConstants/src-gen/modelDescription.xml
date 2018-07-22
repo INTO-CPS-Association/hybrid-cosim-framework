@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><fmiModelDescription fmiVersion="2.0" guid="5856384e-bbde-472c-ba1a-f57d0547f37a" modelName="RateConstants" variableNamingConvention="flat">
+<?xml version="1.0" encoding="UTF-8"?><fmiModelDescription fmiVersion="2.0" guid="65053e2b-9f2a-4290-8c5a-6b09857ddcd8" modelName="RateConstants" variableNamingConvention="flat">
     <ModelVariables>
         <ScalarVariable causality="output" name="psuvolt" valueReference="0" variability="continuous">
             <Real/>

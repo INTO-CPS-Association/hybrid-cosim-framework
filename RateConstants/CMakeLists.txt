@@ -36,11 +36,11 @@ endif()
 
 add_definitions(-DFMI_COSIMULATION)
 
-include_directories(src)
+include_directories(src-gen)
 
-file(GLOB CPP_FILES src/*.cpp)
+file(GLOB CPP_FILES src-gen/*.cpp)
 
-file(GLOB CPP_MAIN_FILES src/main*.cpp)
+file(GLOB CPP_MAIN_FILES src-gen/main*.cpp)
 
 list(REMOVE_ITEM CPP_FILES ${CPP_MAIN_FILES})
 

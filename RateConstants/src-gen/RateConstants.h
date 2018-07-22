@@ -44,15 +44,15 @@
 				RateConstants* getRuleThis();
 				
 				/*in rules*/
-				bool in_rule_condition1();
-				void in_rule_body1();
-				void in_rule_flush1();
+				bool in_rule_condition1(double dt, double h);
+				void in_rule_body1(double dt, double h);
+				void in_rule_flush1(double dt, double h);
 				shared_ptr<list<Rule<RateConstants>>> createInputRules();
 				
 				/*out rules*/
-				bool out_rule_condition1();
-				void out_rule_body1();
-				void out_rule_flush1();
+				bool out_rule_condition1(double dt, double h);
+				void out_rule_body1(double dt, double h);
+				void out_rule_flush1(double dt, double h);
 				shared_ptr<list<Rule<RateConstants>>> createOutputRules();
 				
 				double executeInternalControlFlow(double H, double t);
@@ -61,6 +61,10 @@
 				
 				double psuvolt;
 				double ref;
+				
+				fmi2FMUstate getInternalFMUState();
+				void setInternalFMUState(fmi2FMUstate);
+				void freeInternalFMUState(fmi2FMUstate);
 				
 				double INIT_PSUVOLT;
 				double INIT_REF;
