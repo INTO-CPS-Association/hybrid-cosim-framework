@@ -1,0 +1,11 @@
+semantic adaptation reactive moore RateConstants rateConstants
+at "./RateConstants.fmu"
+
+	for inner fmu Constants constants
+		at "./Constants.fmu"
+		with output ports Real psuvolt, Real ref
+	
+output ports psuvolt <- constants.psuvolt,
+			ref <- constants.ref
+
+
