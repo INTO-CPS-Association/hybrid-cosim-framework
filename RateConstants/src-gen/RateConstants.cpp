@@ -69,28 +69,75 @@ namespace adaptation
 		return false;
 	}
 	
-	void RateConstants::setFmiValue(fmi2ValueReference id, double value)
+    void RateConstants::setFmiValue(fmi2ValueReference id, double value)
+    {
+    }
+    
+    void RateConstants::setFmiValue(fmi2ValueReference id, string value)
+    {
+    }
+    
+    void RateConstants::setFmiValue(fmi2ValueReference id, int value)
+    {
+    }
+    
+    void RateConstants::setFmiValue(fmi2ValueReference id, bool value)
+    {
+    }
+					
+    bool RateConstants::out_rule_condition1(double dt, double h){
+    	return true;
+    }
+    void RateConstants::out_rule_body1(double dt, double h){
+    	this->stored__ref = getValueDouble(constants,CONSTANTSREF);
+    	this->stored__psuvolt = getValueDouble(constants,CONSTANTSPSUVOLT);
+    }
+    void RateConstants::out_rule_flush1(double dt, double h){
+    	this->ref = this->stored__ref;
+    	this->psuvolt = this->stored__psuvolt;
+    }
+    shared_ptr<list<Rule<RateConstants>>> RateConstants::createOutputRules()
+    {
+    	auto list = make_shared<std::list<Rule<RateConstants>>>();
+    	
+    	list->push_back(
+    		(Rule<RateConstants>){
+    			&RateConstants::out_rule_condition1,
+    			&RateConstants::out_rule_body1,
+    			&RateConstants::out_rule_flush1
+    		});
+    	
+    	
+    	return list;
+    	
+    }
+    
+									
+	fmi2FMUstate RateConstants::getInternalFMUState()
 	{
 	}
 	
-	void RateConstants::setFmiValue(fmi2ValueReference id, string value)
+	void RateConstants::setInternalFMUState(fmi2FMUstate)
 	{
 	}
 	
-	void RateConstants::setFmiValue(fmi2ValueReference id, int value)
+	void RateConstants::freeInternalFMUState(fmi2FMUstate)
 	{
 	}
 	
-	void RateConstants::setFmiValue(fmi2ValueReference id, bool value)
+	double RateConstants::executeInternalControlFlow(double H, double t)
 	{
+		int H_constants = this->do_step(constants,H,t);
+		return min({H_constants})
+		;
 	}
 	
-	bool RateConstants::in_rule_condition1(){
+	bool RateConstants::in_rule_condition1(double dt, double h){
 		return true;
 	}
-	void RateConstants::in_rule_body1(){
+	void RateConstants::in_rule_body1(double dt, double h){
 	}
-	void RateConstants::in_rule_flush1(){
+	void RateConstants::in_rule_flush1(double dt, double h){
 	}
 	shared_ptr<list<Rule<RateConstants>>> RateConstants::createInputRules()
 	{
@@ -101,41 +148,6 @@ namespace adaptation
 				&RateConstants::in_rule_condition1,
 				&RateConstants::in_rule_body1,
 				&RateConstants::in_rule_flush1
-			});
-		
-		
-		return list;
-		
-	}
-	
-	
-	double RateConstants::executeInternalControlFlow(double H, double t)
-	{
-		int H_constants = this->do_step(constants,H,t);
-		return min({H_constants})
-		;
-	}
-	
-	bool RateConstants::out_rule_condition1(){
-		return true;
-	}
-	void RateConstants::out_rule_body1(){
-		this->stored__ref = getValueDouble(constants,CONSTANTSREF);
-		this->stored__psuvolt = getValueDouble(constants,CONSTANTSPSUVOLT);
-	}
-	void RateConstants::out_rule_flush1(){
-		this->ref = this->stored__ref;
-		this->psuvolt = this->stored__psuvolt;
-	}
-	shared_ptr<list<Rule<RateConstants>>> RateConstants::createOutputRules()
-	{
-		auto list = make_shared<std::list<Rule<RateConstants>>>();
-		
-		list->push_back(
-			(Rule<RateConstants>){
-				&RateConstants::out_rule_condition1,
-				&RateConstants::out_rule_body1,
-				&RateConstants::out_rule_flush1
 			});
 		
 		

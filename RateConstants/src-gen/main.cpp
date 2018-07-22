@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
 		auto disp = getReal(comp, ID_PSUVOLT_OUT);
 		auto tau = getReal(comp, ID_REF_OUT);
 
-		cout << "time: " << time << " disp: " << disp << " tau: " << tau
+		cout << "time: " << time << " psuvolt: " << disp << " tau: " << tau
 				<< endl;
 	}
 
