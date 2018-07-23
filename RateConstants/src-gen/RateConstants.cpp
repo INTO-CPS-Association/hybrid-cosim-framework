@@ -8,17 +8,17 @@ namespace adaptation
 		
 		this->INIT_PSUVOLT = 0.0;
 		this->INIT_REF = 0.0;
-		this->stored__psuvolt = this->INIT_PSUVOLT;
 		this->stored__ref = this->INIT_REF;
+		this->stored__psuvolt = this->INIT_PSUVOLT;
 	}
 	
-	void RateConstants::initialize()
+	void RateConstants::initialize(bool loggingOn)
 	{				
 		auto path = make_shared<string>(*resourceLocation);
 		path->append(string("Constants.fmu"));
 		auto constantsFmu = make_shared<fmi2::Fmu>(*path);
 		constantsFmu->initialize();
-		this->constants = constantsFmu->instantiate("constants",fmi2CoSimulation, "{bb398d58-c0ba-4011-8fc2-a09893a75244}", true, true, shared_from_this());
+		this->constants = constantsFmu->instantiate("constants",fmi2CoSimulation, "{bb398d58-c0ba-4011-8fc2-a09893a75244}", true, loggingOn, shared_from_this());
 		
 		if(this->constants->component == NULL)
 			this->lastErrorState = fmi2Fatal;
@@ -89,12 +89,12 @@ namespace adaptation
     	return true;
     }
     void RateConstants::out_rule_body1(double dt, double h){
-    	this->stored__ref = getValueDouble(constants,CONSTANTSREF);
     	this->stored__psuvolt = getValueDouble(constants,CONSTANTSPSUVOLT);
+    	this->stored__ref = getValueDouble(constants,CONSTANTSREF);
     }
     void RateConstants::out_rule_flush1(double dt, double h){
-    	this->ref = this->stored__ref;
     	this->psuvolt = this->stored__psuvolt;
+    	this->ref = this->stored__ref;
     }
     shared_ptr<list<Rule<RateConstants>>> RateConstants::createOutputRules()
     {

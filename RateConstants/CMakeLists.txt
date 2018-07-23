@@ -75,7 +75,7 @@ message(STATUS "Static linking with libstdc++.a in ${STDCPP_LIBRARY}")
 if (WIN32)
 	#windows	
 	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libstdc++ -static-libgcc -Wl,-Bstatic -lstdc++ -lpthread -Wl,-Bdynamic")
- set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++ -static-libgcc  -Wl,-Bstatic -lstdc++ -lpthread -Wl,-Bdynamic")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++ -static-libgcc  -Wl,-Bstatic -lstdc++ -lpthread -Wl,-Bdynamic")
 endif() 
 
 
@@ -84,9 +84,9 @@ endif()
 #if(NOT APPLE)
 #https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man3/pthread.3.html 
 #it is included in system
-find_library(PTHREAD_LIBRARY NAMES libwinpthread.dll.a)# libpthread.a libpthread.dylib )
-#message( INFO ${PTHREAD_LIBRARY})
-#target_link_libraries(${PROJECT_NAME}_main ${PTHREAD_LIBRARY} /C/msys64/mingw64/x86_64-w64-mingw32/lib/libwinpthread.a)
+find_library(PTHREAD_LIBRARY NAMES libwinpthread-1.dll)# libpthread.a libpthread.dylib )
+message( INFO ${PTHREAD_LIBRARY})
+target_link_libraries(${PROJECT_NAME} ${PTHREAD_LIBRARY})
 #endif()
 
 
