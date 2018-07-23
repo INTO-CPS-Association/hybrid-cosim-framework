@@ -86,12 +86,17 @@ int main(int argc, char *argv[]) {
 	double time = 0.0;
 	double stepSize = 0.01;
 
-	for (double time = 0.0; time < 2;) {
+	for (double time = 0.0; time < stepSize;) {
 		time += stepSize;
-
+		
+		if (fmi2DoStep(comp, time, stepSize, false)!= fmi2OK) {
+			printf("Errorin do step");
+			return 1;
+		}
+		
 		auto disp = getReal(comp, ID_PSUVOLT_OUT);
 		auto tau = getReal(comp, ID_REF_OUT);
-
+		
 		cout << "time: " << time << " psuvolt: " << disp << " tau: " << tau
 				<< endl;
 	}

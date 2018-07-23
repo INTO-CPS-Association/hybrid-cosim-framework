@@ -8,4 +8,21 @@ at "./RateConstants.fmu"
 output ports psuvolt <- constants.psuvolt,
 			ref <- constants.ref
 
+param 	RATE := 10;
+
+control rules {
+	var micro_step := 0.0;
+	var inner_time := 0.0;
+	
+	inner_time := t;
+	
+	micro_step := H/RATE;
+	
+	for (var iter in 0 .. RATE) {
+		do_step(constants,inner_time,micro_step);
+		inner_time := inner_time + micro_step;	
+	}
+	
+	return H;
+}
 

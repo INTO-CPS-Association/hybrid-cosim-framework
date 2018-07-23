@@ -6,10 +6,10 @@ namespace adaptation
 		SemanticAdaptation(fmiInstanceName, resourceLocation, createInputRules(),createOutputRules(), functions)
 	{
 		
+		this->RATE = 10;
 		this->INIT_PSUVOLT = 0.0;
 		this->INIT_REF = 0.0;
-		this->stored__ref = this->INIT_REF;
-		this->stored__psuvolt = this->INIT_PSUVOLT;
+		this->stored__ref = this->INIT_REF;this->stored__psuvolt = this->INIT_PSUVOLT;
 	}
 	
 	void RateConstants::initialize(bool loggingOn)
@@ -127,9 +127,16 @@ namespace adaptation
 	
 	double RateConstants::executeInternalControlFlow(double H, double t)
 	{
-		int H_constants = this->do_step(constants,H,t);
-		return min({H_constants})
-		;
+		double micro_step = 0.0;
+		double inner_time = 0.0;
+		inner_time = t;
+		micro_step = H / this->RATE;
+		for(int iter=0; iter<this->RATE; iter++){
+			this->do_step(constants,micro_step,inner_time);
+			inner_time = inner_time + micro_step;
+		}
+		
+		return H;
 	}
 	
 	bool RateConstants::in_rule_condition1(double dt, double h){

@@ -66,6 +66,7 @@
 				void setInternalFMUState(fmi2FMUstate);
 				void freeInternalFMUState(fmi2FMUstate);
 				
+				int RATE;
 				double INIT_PSUVOLT;
 				double INIT_REF;
 				double stored__ref;
