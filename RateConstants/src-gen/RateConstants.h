@@ -26,7 +26,7 @@
 		{
 			public:
 				RateConstants(shared_ptr<std::string> fmiInstanceName, shared_ptr<string> resourceLocation, const fmi2CallbackFunctions* functions);
-				void initialize();
+				void initialize(bool loggingOn);
 				virtual ~RateConstants();
 				
 				void setFmiValue(fmi2ValueReference id, int value);
@@ -68,8 +68,8 @@
 				
 				double INIT_PSUVOLT;
 				double INIT_REF;
-				double stored__psuvolt;
 				double stored__ref;
+				double stored__psuvolt;
 		};
 	}
 	

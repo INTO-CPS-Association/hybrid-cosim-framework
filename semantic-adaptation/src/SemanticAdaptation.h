@@ -71,7 +71,7 @@ class SemanticAdaptation: public fmi2::Callback
 public:
 	SemanticAdaptation(shared_ptr<std::string> fmiInstanceName, shared_ptr<std::string> resourceLocation,
 			shared_ptr<std::list<Rule<T>>>inRules, shared_ptr<std::list<Rule<T>>> outRules,const fmi2CallbackFunctions *functions);
-	virtual void initialize()=0;
+	virtual void initialize(bool loggingOn)=0;
 	virtual ~SemanticAdaptation();
 
 	virtual fmi2Status executeControlFlow(double h, double dt) final;

@@ -57,7 +57,7 @@ extern "C" fmi2Component fmi2Instantiate(fmi2String instanceName, fmi2Type fmuTy
 	g_adaptation = make_shared<adaptation::RateConstants>(name, resourceLoc, functions);
 	try
 	{
-		g_adaptation->initialize();
+		g_adaptation->initialize(loggingOn);
 	} catch (adaptation::SemanticAdaptationFmiException& e)
 	{
 		return NULL;

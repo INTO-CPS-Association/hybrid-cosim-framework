@@ -12,9 +12,9 @@ var H_constants := do_step ( constants , t , H ) ;
 return min ( H_constants ) ; }
 in rules {
 true -> { } --> { } ; }
-out var Real stored__psuvolt := INIT_PSUVOLT , Real stored__ref := INIT_REF ; out rules {
+out var Real stored__ref := INIT_REF , Real stored__psuvolt := INIT_PSUVOLT ; out rules {
 true -> {
-stored__ref := constants . ref ;
-stored__psuvolt := constants . psuvolt ; } --> {
-rateConstants . ref := stored__ref ;
-rateConstants . psuvolt := stored__psuvolt ; } ; }
+stored__psuvolt := constants . psuvolt ;
+stored__ref := constants . ref ; } --> {
+rateConstants . psuvolt := stored__psuvolt ;
+rateConstants . ref := stored__ref ; } ; }

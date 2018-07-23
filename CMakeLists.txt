@@ -42,6 +42,5 @@ endif()
 
 add_subdirectory(third_party/googletest/googletest)
 add_subdirectory (semantic-adaptation)
-add_subdirectory (window-sa)
 add_subdirectory (window)
 add_subdirectory (RateConstants)
