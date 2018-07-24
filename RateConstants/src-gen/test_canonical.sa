@@ -1,4 +1,4 @@
-semantic adaptation reactive moore RateConstants rateConstants
+semantic adaptation reactive moore RateConstants
 at "./RateConstants.fmu"
 
 	for inner fmu Constants constants
@@ -26,9 +26,9 @@ control rules {
 
 in rules {
 true -> { } --> { } ; }
-out var Real stored__ref := INIT_REF , Real stored__psuvolt := INIT_PSUVOLT ; out rules {
+out var Real stored__psuvolt := INIT_PSUVOLT , Real stored__ref := INIT_REF ; out rules {
 true -> {
 stored__psuvolt := constants . psuvolt ;
 stored__ref := constants . ref ; } --> {
-rateConstants . psuvolt := stored__psuvolt ;
-rateConstants . ref := stored__ref ; } ; }
+RateConstants . psuvolt := stored__psuvolt ;
+RateConstants . ref := stored__ref ; } ; }

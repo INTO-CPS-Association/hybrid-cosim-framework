@@ -14,10 +14,6 @@
 		
 		#define CONSTANTSPSUVOLT 0
 		#define CONSTANTSREF 1
-		#define CONSTANTSCONST.K 2
-		#define CONSTANTSCONST2.K 3
-		#define CONSTANTSCONST.Y 2
-		#define CONSTANTSCONST2.Y 3
 		
 		#define RATECONSTANTSPSUVOLT 0
 		#define RATECONSTANTSREF 1
@@ -69,8 +65,8 @@
 				int RATE;
 				double INIT_PSUVOLT;
 				double INIT_REF;
-				double stored__ref;
 				double stored__psuvolt;
+				double stored__ref;
 		};
 	}
 	
