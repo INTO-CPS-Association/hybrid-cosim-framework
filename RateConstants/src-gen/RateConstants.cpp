@@ -9,7 +9,7 @@ namespace adaptation
 		this->RATE = 10;
 		this->INIT_PSUVOLT = 0.0;
 		this->INIT_REF = 0.0;
-		this->stored__ref = this->INIT_REF;this->stored__psuvolt = this->INIT_PSUVOLT;
+		this->stored__psuvolt = this->INIT_PSUVOLT;this->stored__ref = this->INIT_REF;
 	}
 	
 	void RateConstants::initialize(bool loggingOn)
