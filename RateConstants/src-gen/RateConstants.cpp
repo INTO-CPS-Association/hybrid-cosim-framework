@@ -85,16 +85,16 @@ namespace adaptation
     {
     }
 					
-    bool RateConstants::out_rule_condition1(double dt, double h){
+    bool RateConstants::out_rule_condition1(double dt, double H, double h){
     	return true;
     }
-    void RateConstants::out_rule_body1(double dt, double h){
-    	this->stored__psuvolt = getValueDouble(constants,CONSTANTSPSUVOLT);
+    void RateConstants::out_rule_body1(double dt, double H, double h){
     	this->stored__ref = getValueDouble(constants,CONSTANTSREF);
+    	this->stored__psuvolt = getValueDouble(constants,CONSTANTSPSUVOLT);
     }
-    void RateConstants::out_rule_flush1(double dt, double h){
-    	this->psuvolt = this->stored__psuvolt;
+    void RateConstants::out_rule_flush1(double dt, double H, double h){
     	this->ref = this->stored__ref;
+    	this->psuvolt = this->stored__psuvolt;
     }
     shared_ptr<list<Rule<RateConstants>>> RateConstants::createOutputRules()
     {
@@ -125,26 +125,26 @@ namespace adaptation
 	{
 	}
 	
-	double RateConstants::executeInternalControlFlow(double H, double t)
+	double RateConstants::executeInternalControlFlow(double t, double H)
 	{
 		double micro_step = 0.0;
 		double inner_time = 0.0;
 		inner_time = t;
 		micro_step = H / this->RATE;
 		for(int iter=0; iter<this->RATE; iter++){
-			this->do_step(constants,micro_step,inner_time);
+			this->do_step(constants,inner_time,inner_time-t,micro_step);
 			inner_time = inner_time + micro_step;
 		}
 		
 		return H;
 	}
 	
-	bool RateConstants::in_rule_condition1(double dt, double h){
+	bool RateConstants::in_rule_condition1(double dt, double H, double h){
 		return true;
 	}
-	void RateConstants::in_rule_body1(double dt, double h){
+	void RateConstants::in_rule_body1(double dt, double H, double h){
 	}
-	void RateConstants::in_rule_flush1(double dt, double h){
+	void RateConstants::in_rule_flush1(double dt, double H, double h){
 	}
 	shared_ptr<list<Rule<RateConstants>>> RateConstants::createInputRules()
 	{
