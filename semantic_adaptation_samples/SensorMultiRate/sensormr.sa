@@ -1,0 +1,43 @@
+semantic adaptation reactive moore SensorMultiRate
+at "./SensorMultiRate.fmu"
+
+	for inner fmu Sensor sensor
+		at "./LoadNSensor_FixedEuler_1Em6.fmu"
+		with input ports Real f "F_INPUT@expseu_"
+		with output ports Real x_aft "X_AFTER_LOAD@expseu_", Real v "V_OUTPUT@expseu_", Real x "X_OUTPUT@expseu_"
+
+input ports Real f -> sensor.f
+
+param RATE:=0; 
+
+control var previous_f := 0.0;
+control var previous_H := 1.0;
+
+control rules {
+	var micro_step := 0.0;
+	var inner_time := 0.0;
+	
+	inner_time := t;
+	
+	micro_step := H/RATE;
+	
+	for (var iter in 0 .. RATE) {
+		do_step(sensor,inner_time,micro_step);
+		inner_time := inner_time + micro_step;	
+	}
+	
+	previous_f := current_f;
+	previous_H := H;
+	
+	return H;
+}
+
+in var current_f := 0.0;
+in rules {
+	true -> {
+		current_f := f;
+	} --> {
+		//sensor.f := previous_f + ((current_f - previous_f)/previous_H)*dt ;
+		sensor.f := current_f;
+	};
+}
