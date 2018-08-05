@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 	fmi2CallbackFunctions callback = { &fmuLoggerCache, NULL, NULL, NULL, NULL };
 	fmi2Component comp =
 			fmi2Instantiate("this system", fmi2CoSimulation, "{1234}",
-					"C:\\srcctrl\\into-cps-organization\\hybridCosimulation-framework\\RateConstants",
+					"C:\\srcctrl\\into-cps-organization\\hybridCosimulation-framework\\semantic_adaptation_samples\\SensorMultiRate",
 					&callback, fmi2True,
 					fmi2True);
 
@@ -86,8 +86,7 @@ int main(int argc, char *argv[]) {
 	double time = 0.0;
 	double stepSize = 0.01;
 
-	for (double time = 0.0; time < stepSize;) {
-		time += stepSize;
+	for (double time = 0.0; time < stepSize; time += stepSize) {
 
 		if (fmi2DoStep(comp, time, stepSize, false)!= fmi2OK) {
 			printf("Errorin do step");

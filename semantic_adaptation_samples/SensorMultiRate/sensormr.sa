@@ -11,7 +11,6 @@ input ports Real f -> sensor.f
 param RATE:=0; 
 
 control var previous_f := 0.0;
-control var previous_H := 1.0;
 
 control rules {
 	var micro_step := 0.0;
@@ -27,7 +26,6 @@ control rules {
 	}
 	
 	previous_f := current_f;
-	previous_H := H;
 	
 	return H;
 }
@@ -37,7 +35,7 @@ in rules {
 	true -> {
 		current_f := f;
 	} --> {
-		//sensor.f := previous_f + ((current_f - previous_f)/previous_H)*dt ;
-		sensor.f := current_f;
+		sensor.f := previous_f + ((current_f - previous_f)/H)*dt ;
+		//sensor.f := current_f;
 	};
 }

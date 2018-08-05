@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><fmiModelDescription fmiVersion="2.0" guid="c5ca2862-7fef-46df-b6a0-c60bb0d2c6bb" modelName="RateConstants" variableNamingConvention="flat">
+<?xml version="1.0" encoding="UTF-8"?><fmiModelDescription fmiVersion="2.0" guid="e030083c-1ded-4dae-b558-8d1b699dbfab" modelName="RateConstants" variableNamingConvention="flat">
     <CoSimulation canBeInstantiatedOnlyOncePerProcess="false" canGetAndSetFMUstate="false" canHandleVariableCommunicationStepSize="true" canInterpolateInputs="false" canNotUseMemoryManagementFunctions="false" canRunAsynchronuously="false" canSerializeFMUstate="false" maxOutputDerivativeOrder="0" modelIdentifier="RateConstants" needsExecutionTool="false"/>
     <ModelVariables>
         <ScalarVariable causality="output" name="psuvolt" valueReference="0" variability="continuous">
