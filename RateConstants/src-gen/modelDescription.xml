@@ -1,5 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?><fmiModelDescription fmiVersion="2.0" guid="c5ca2862-7fef-46df-b6a0-c60bb0d2c6bb" modelName="RateConstants" variableNamingConvention="flat">
-    <CoSimulation canBeInstantiatedOnlyOncePerProcess="false" canGetAndSetFMUstate="false" canHandleVariableCommunicationStepSize="true" canInterpolateInputs="false" canNotUseMemoryManagementFunctions="false" canRunAsynchronuously="false" canSerializeFMUstate="false" maxOutputDerivativeOrder="0" modelIdentifier="RateConstants" needsExecutionTool="false"/>
+<?xml version="1.0" encoding="UTF-8"?><fmiModelDescription copyright="Aarhus University and University of Antwerpen" fmiVersion="2.0" generationTool="BaseSA" guid="9519b48e-d7e3-4194-ad51-181a15202754" license="MIT" modelName="RateConstants" numberOfEventIndicators="0" variableNamingConvention="flat">
+    <CoSimulation canBeInstantiatedOnlyOncePerProcess="true" canGetAndSetFMUstate="true" canHandleVariableCommunicationStepSize="true" canInterpolateInputs="true" canNotUseMemoryManagementFunctions="true" canRunAsynchronuously="false" canSerializeFMUstate="false" maxOutputDerivativeOrder="0" modelIdentifier="RateConstants" needsExecutionTool="false" providesDirectionalDerivative="false"/>
+    <LogCategories>
+        <Category name="logAll"/>
+        <Category name="logError"/>
+        <Category name="logFmiCall"/>
+        <Category name="logEvent"/>
+    </LogCategories>
     <ModelVariables>
         <ScalarVariable causality="output" name="psuvolt" valueReference="0" variability="continuous">
             <Real/>
