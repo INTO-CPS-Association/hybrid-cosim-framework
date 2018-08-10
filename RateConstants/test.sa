@@ -1,4 +1,4 @@
-semantic adaptation reactive moore RateConstants rateConstants
+semantic adaptation reactive moore RateConstants
 at "./RateConstants.fmu"
 
 	for inner fmu Constants constants

@@ -28,7 +28,7 @@ in rules {
 true -> { } --> { } ; }
 out var Real stored__psuvolt := INIT_PSUVOLT , Real stored__ref := INIT_REF ; out rules {
 true -> {
-stored__psuvolt := constants . psuvolt ;
-stored__ref := constants . ref ; } --> {
-RateConstants . psuvolt := stored__psuvolt ;
-RateConstants . ref := stored__ref ; } ; }
+stored__ref := constants . ref ;
+stored__psuvolt := constants . psuvolt ; } --> {
+RateConstants . ref := stored__ref ;
+RateConstants . psuvolt := stored__psuvolt ; } ; }

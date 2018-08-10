@@ -29,7 +29,7 @@ static void notimplemented(fmi2Component c, fmi2String message)
 	std::string m(message);
 	if (g_functions != NULL)
 	{
-		log(g_functions, g_adaptation->getComponent(), "", fmi2Error, "error", (base + m).c_str(), "");
+		log(g_functions, g_functions->componentEnvironment, "", fmi2Error, "error", (base + m).c_str(), "");
 	}
 }
 
@@ -38,7 +38,7 @@ static void fmiprintf(fmi2String message, T arg)
 {
 	if (g_functions != NULL)
 	{
-		log(g_functions, g_adaptation->getComponent(), name->c_str(), fmi2OK, "logAll", message, arg);
+		log(g_functions, g_functions->componentEnvironment, name->c_str(), fmi2OK, "logAll", message, arg);
 	}
 }
 
@@ -253,15 +253,15 @@ extern "C" fmi2Status fmi2SetString(fmi2Component c, const fmi2ValueReference vr
 
 extern "C" fmi2Status fmi2GetFMUstate(fmi2Component c, fmi2FMUstate* FMUstate)
 {
-	return fmi2OK;
+ return g_adaptation->fmi2GetFMUstate(FMUstate);
 }
 extern "C" fmi2Status fmi2SetFMUstate(fmi2Component c, fmi2FMUstate FMUstate)
 {
-	return fmi2OK;
+ return g_adaptation->fmi2SetFMUstate(FMUstate);
 }
 extern "C" fmi2Status fmi2FreeFMUstate(fmi2Component c, fmi2FMUstate* FMUstate)
 {
-	return fmi2OK;
+ return g_adaptation->fmi2FreeFMUstate(FMUstate);
 }
 
 extern "C" fmi2Status fmi2SerializedFMUstateSize(fmi2Component c, fmi2FMUstate FMUstate, size_t *size)
