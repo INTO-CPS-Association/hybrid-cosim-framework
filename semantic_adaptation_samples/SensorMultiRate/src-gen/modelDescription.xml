@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?><fmiModelDescription copyright="Aarhus University and University of Antwerpen" fmiVersion="2.0" generationTool="BaseSA" guid="de66a766-6b6d-4877-9562-fe83e897a07a" license="MIT" modelName="SensorMultiRate" numberOfEventIndicators="0" variableNamingConvention="flat">
+    <CoSimulation canBeInstantiatedOnlyOncePerProcess="true" canGetAndSetFMUstate="true" canHandleVariableCommunicationStepSize="true" canInterpolateInputs="true" canNotUseMemoryManagementFunctions="true" canRunAsynchronuously="false" canSerializeFMUstate="false" maxOutputDerivativeOrder="0" modelIdentifier="SensorMultiRate" needsExecutionTool="false" providesDirectionalDerivative="false"/>
+    <LogCategories>
+        <Category name="logAll"/>
+        <Category name="logError"/>
+        <Category name="logFmiCall"/>
+        <Category name="logEvent"/>
+    </LogCategories>
+    <ModelVariables>
+        <ScalarVariable causality="input" name="f" valueReference="0" variability="discrete">
+            <Integer/>
+        </ScalarVariable>
+        <ScalarVariable causality="output" name="x_aft" valueReference="1" variability="continuous">
+            <Real/>
+        </ScalarVariable>
+        <ScalarVariable causality="output" name="v" valueReference="2" variability="continuous">
+            <Real/>
+        </ScalarVariable>
+        <ScalarVariable causality="output" name="x" valueReference="3" variability="continuous">
+            <Real/>
+        </ScalarVariable>
+    </ModelVariables>
+    <ModelStructure>
+        <Outputs>
+            <Unknown dependencies="" index="2"/>
+            <Unknown dependencies="" index="3"/>
+            <Unknown dependencies="" index="4"/>
+        </Outputs>
+    </ModelStructure>
+</fmiModelDescription>
