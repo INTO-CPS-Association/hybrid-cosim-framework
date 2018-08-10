@@ -8,12 +8,12 @@
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -116,7 +116,7 @@ public:
 
 protected:
 	virtual double executeInternalControlFlow(double t, double H);
-	double do_step(shared_ptr<FmuComponent>,double t,double H);
+	double do_step(shared_ptr<FmuComponent> fmuComp, double t, double dt, double h);
 
 	void save_state(shared_ptr<FmuComponent>);
 	void rollback(shared_ptr<FmuComponent>);
@@ -166,6 +166,7 @@ private:
 
 	double lastDt = 0.0;
 	double lastH = 0.0;
+	double lasth = 0.0;
 
 };
 
@@ -218,12 +219,12 @@ fmi2Status SemanticAdaptation<T>::executeInRules()
 	for (auto itr = this->inRules->begin(), end = this->inRules->end(); itr != end; ++itr)
 	{
 		Rule<T> rule = *itr;
-		if (((*getRuleThis()).*rule.condition)(this->lastDt, this->lastH))
+		if (((*getRuleThis()).*rule.condition)(this->lastDt, this->lastH, this->lasth))
 		{
-			((*getRuleThis()).*rule.body)(this->lastDt, this->lastH);
+			((*getRuleThis()).*rule.body)(this->lastDt, this->lastH, this->lasth);
 			if (this->machineType == Mealy)
 			{
-				((*getRuleThis()).*rule.flush)(this->lastDt, this->lastH);
+				((*getRuleThis()).*rule.flush)(this->lastDt, this->lastH, this->lasth);
 				this->executeOutRules(true);
 			}
 			this->enablesInRules->push_back(*itr);
@@ -244,12 +245,12 @@ fmi2Status SemanticAdaptation<T>::executeOutRules(bool ignoreEnabledCheck)
 	for (auto itr = this->outRules->begin(), end = this->outRules->end(); itr != end; ++itr)
 	{
 		Rule<T> rule = *itr;
-		if (((*getRuleThis()).*rule.condition)(this->lastDt, this->lastH))
+		if (((*getRuleThis()).*rule.condition)(this->lastDt, this->lastH, this->lasth))
 		{
-			((*getRuleThis()).*rule.body)(this->lastDt, this->lastH);
+			((*getRuleThis()).*rule.body)(this->lastDt, this->lastH, this->lasth);
 			if (this->machineType == Mealy)
 			{
-				((*getRuleThis()).*rule.flush)(this->lastDt, this->lastH);
+				((*getRuleThis()).*rule.flush)(this->lastDt, this->lastH, this->lasth);
 			}
 			this->enablesOutRules->push_back(*itr);
 		}
@@ -264,7 +265,7 @@ void SemanticAdaptation<T>::flushAllEnabledInRules()
 	for (auto itr = this->enablesInRules->begin(), end = this->enablesInRules->end(); itr != end; ++itr)
 	{
 		Rule<T> rule = *itr;
-		((*getRuleThis()).*rule.flush)(this->lastDt, this->lastH);
+		((*getRuleThis()).*rule.flush)(this->lastDt, this->lastH, this->lasth);
 
 	}
 }
@@ -275,7 +276,7 @@ fmi2Status SemanticAdaptation<T>::flushAllEnabledOutRules()
 	for (auto itr = this->enablesOutRules->begin(), end = this->enablesOutRules->end(); itr != end; ++itr)
 	{
 		Rule<T> rule = *itr;
-		((*getRuleThis()).*rule.flush)(this->lastDt, this->lastH);
+		((*getRuleThis()).*rule.flush)(this->lastDt, this->lastH, this->lasth);
 
 	}
 
@@ -292,7 +293,11 @@ template<class T>
 fmi2Status SemanticAdaptation<T>::executeControlFlow(double t, double H)
 {
 	this->enablesOutRules->clear();
-
+	
+	this->lastDt = 0.0;
+	this->lastH = H;
+	this->lasth = 0.0;
+	
 	//flush all enabled in-rules
 	flushAllEnabledInRules();
 
@@ -373,26 +378,33 @@ fmi2Status SemanticAdaptation<T>::setValue(shared_ptr<FmuComponent> fmuComp, fmi
 }
 
 template<class T>
-double SemanticAdaptation<T>::do_step(shared_ptr<FmuComponent> fmuComp, double t, double H)
+double SemanticAdaptation<T>::do_step(shared_ptr<FmuComponent> fmuComp, double t, double dt, double h)
 {
 #ifdef SA_DEBUG
-	printf("Calling doStep on %s,%p, comminicationPoint=%f, stepsize=%f\n",fmuComp->fmu->getPath()->c_str(),fmuComp->component,t,H);
+	printf("Calling doStep on %s,%p, comminicationPoint=%f, stepsize=%f\n",fmuComp->fmu->getPath()->c_str(),fmuComp->component,t,h);
 #endif
-	fmi2Status status = fmuComp->fmu->doStep(fmuComp->component, t, H, false);
+	
+	this->lastDt = dt;
+	this->lasth = h;
+	
+	//flush all enabled in-rules
+	flushAllEnabledInRules();
+
+	fmi2Status status = fmuComp->fmu->doStep(fmuComp->component, t, h, false);
 	if (status != fmi2OK)
 	{
-		cerr << "do_step failed: t: " << t << " h: " << H << " " << status << endl;
+		cerr << "do_step failed: t: " << t << " h: " << h << " " << status << endl;
 		this->lastErrorState = status;
 		if (status == fmi2Discard)
 		{
-			double h;
-			status = fmuComp->fmu->getRealStatus(fmuComp->component, fmi2StatusKind::fmi2LastSuccessfulTime, &h);
+			double rs;
+			status = fmuComp->fmu->getRealStatus(fmuComp->component, fmi2StatusKind::fmi2LastSuccessfulTime, &rs);
 			if (status == fmi2OK)
 			{
-				return h;
+				return rs;
 			} else
 			{
-				cerr << "fmi2getRealStatus failed: t: " << t << " h: " << H << " " << status << endl;
+				cerr << "fmi2getRealStatus failed: t: " << t << " h: " << h << " " << status << endl;
 				this->lastErrorState = status;
 				THROW_STATUS_EXCEPTION;
 			}
@@ -402,17 +414,15 @@ double SemanticAdaptation<T>::do_step(shared_ptr<FmuComponent> fmuComp, double t
 		}
 	}
 
-	this->lastDt = t;
-	this->lastH = H;
 	status = this->executeOutRules();
 	if (status != fmi2OK)
 	{
-		cerr << "do_step-executeOutRiles failed: t: " << t << " h: " << H << " " << status << endl;
+		cerr << "do_step-executeOutRiles failed: t: " << t << " h: " << h << " " << status << endl;
 		this->lastErrorState = status;
 		THROW_STATUS_EXCEPTION;
 	}
 
-	return H;
+	return h;
 }
 
 template<class T>

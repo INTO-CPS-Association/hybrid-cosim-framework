@@ -20,7 +20,7 @@
 # #~%
 #
 cmake_minimum_required (VERSION 2.8.5)
-project (SensorMR C CXX)
+project (SensorMultiRate C CXX)
 
 include(CheckCXXCompilerFlag)
 

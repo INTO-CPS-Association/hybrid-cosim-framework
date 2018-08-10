@@ -19,12 +19,12 @@
 					this->internalState.INIT_X_AFT = 0.0;
 					this->internalState.INIT_V = 0.0;
 					this->internalState.INIT_X = 0.0;
-					this->internalState.current_f = 0;
+					this->internalState.current_f = 0.0;
 					this->internalState.stored__f = this->internalState.INIT_F;
-					this->internalState.stored__v = this->internalState.INIT_V;
 					this->internalState.stored__x_aft = this->internalState.INIT_X_AFT;
+					this->internalState.stored__v = this->internalState.INIT_V;
 					this->internalState.stored__x = this->internalState.INIT_X;
-					this->internalState.previous_f = 0;
+					this->internalState.previous_f = 0.0;
 				}
 				
 				void SensorMultiRate::initialize(bool loggingOn)
@@ -119,6 +119,18 @@
 						printf("SensorMultiRate::setFmiValue(%d,?)",id);
 						printf("\n");
 					#endif	
+					switch (id)	
+						{
+							case SENSORMULTIRATEF:
+							{
+								this->internalState.f = value;
+								this->internalState.isSetf = true;
+								break;
+							}
+							default:
+							{
+							}
+						}
 				}
 				
 				void SensorMultiRate::setFmiValue(fmi2ValueReference id, string value)
@@ -135,18 +147,6 @@
 						printf("SensorMultiRate::setFmiValue(%d,?)",id);
 						printf("\n");
 					#endif	
-					switch (id)	
-						{
-							case SENSORMULTIRATEF:
-							{
-								this->internalState.f = value;
-								this->internalState.isSetf = true;
-								break;
-							}
-							default:
-							{
-							}
-						}
 				}
 				
 				void SensorMultiRate::setFmiValue(fmi2ValueReference id, bool value)
@@ -229,18 +229,18 @@
 						printf("Invoking void SensorMultiRate::out_rule_body1(double dt, double h)");
 						printf("\n");
 					#endif	
+					this->internalState.stored__v = getValueDouble(sensor,SENSORV);
 					this->internalState.stored__x = getValueDouble(sensor,SENSORX);
 					this->internalState.stored__x_aft = getValueDouble(sensor,SENSORX_AFT);
-					this->internalState.stored__v = getValueDouble(sensor,SENSORV);
 				}
 				void SensorMultiRate::out_rule_flush1(double dt, double h){
 					#ifdef SA_DEBUG
 						printf("Invoking void SensorMultiRate::out_rule_flush1(double dt, double h)");
 						printf("\n");
 					#endif	
+					this->internalState.v = this->internalState.stored__v;
 					this->internalState.x = this->internalState.stored__x;
 					this->internalState.x_aft = this->internalState.stored__x_aft;
-					this->internalState.v = this->internalState.stored__v;
 				}
 				shared_ptr<list<Rule<SensorMultiRate>>> SensorMultiRate::createOutputRules()
 				{

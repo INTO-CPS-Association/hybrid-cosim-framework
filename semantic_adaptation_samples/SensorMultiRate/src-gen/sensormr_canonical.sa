@@ -10,7 +10,7 @@ input ports Real f output ports Real x_aft , Real v , Real x
 
 param Integer RATE:=0 , Real INIT_F := 0.0 , Real INIT_X_AFT := 0.0 , Real INIT_V := 0.0 , Real INIT_X := 0.0 ; 
 
-control var Integer previous_f := 0;
+control var Real previous_f := 0.0;
 
 control rules {
 	var Real micro_step := 0.0;
@@ -30,22 +30,22 @@ control rules {
 	return H;
 }
 
-in var Integer current_f := 0 , Real stored__f := INIT_F ;
+in var Real current_f := 0.0 , Real stored__f := INIT_F ;
 in rules {
 	true -> {
 stored__f := SensorMultiRate . f ;
 		current_f := f;
 	} --> {
 sensor . f := stored__f ;
-		//sensor.f := previous_f + (current_f - previous_f)*(dt + h) ;
+		//sensor.f := previous_f + ((current_f - previous_f)/H)*dt ;
 		sensor.f := current_f;
 	};
 }
-out var Real stored__v := INIT_V , Real stored__x_aft := INIT_X_AFT , Real stored__x := INIT_X ; out rules {
+out var Real stored__x_aft := INIT_X_AFT , Real stored__v := INIT_V , Real stored__x := INIT_X ; out rules {
 true -> {
+stored__v := sensor . v ;
 stored__x := sensor . x ;
-stored__x_aft := sensor . x_aft ;
-stored__v := sensor . v ; } --> {
+stored__x_aft := sensor . x_aft ; } --> {
+SensorMultiRate . v := stored__v ;
 SensorMultiRate . x := stored__x ;
-SensorMultiRate . x_aft := stored__x_aft ;
-SensorMultiRate . v := stored__v ; } ; }
+SensorMultiRate . x_aft := stored__x_aft ; } ; }
