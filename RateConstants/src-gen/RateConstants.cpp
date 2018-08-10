@@ -26,7 +26,7 @@
 					this->reactiveness = ReactiveOrDelayed::Reactive;
 					this->machineType = MooreOrMealy::Moore;
 					auto path1 = make_shared<string>(*resourceLocation);
-					path1->append(string("Constants.fmu"));
+					path1->append(string("./Constants.fmu"));
 					auto constantsFmu = make_shared<fmi2::Fmu>(*path1);
 					constantsFmu->initialize();
 					this->constants = constantsFmu->instantiate("constants",fmi2CoSimulation, "{bb398d58-c0ba-4011-8fc2-a09893a75244}", true, loggingOn, shared_from_this());
@@ -200,16 +200,16 @@
 						printf("Invoking void RateConstants::out_rule_body1(double dt, double h)");
 						printf("\n");
 					#endif	
-					this->internalState.stored__ref = getValueDouble(constants,CONSTANTSREF);
 					this->internalState.stored__psuvolt = getValueDouble(constants,CONSTANTSPSUVOLT);
+					this->internalState.stored__ref = getValueDouble(constants,CONSTANTSREF);
 				}
 				void RateConstants::out_rule_flush1(double dt, double h){
 					#ifdef SA_DEBUG
 						printf("Invoking void RateConstants::out_rule_flush1(double dt, double h)");
 						printf("\n");
 					#endif	
-					this->internalState.ref = this->internalState.stored__ref;
 					this->internalState.psuvolt = this->internalState.stored__psuvolt;
+					this->internalState.ref = this->internalState.stored__ref;
 				}
 				shared_ptr<list<Rule<RateConstants>>> RateConstants::createOutputRules()
 				{

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><fmiModelDescription copyright="Aarhus University and University of Antwerpen" fmiVersion="2.0" generationTool="BaseSA" guid="de66a766-6b6d-4877-9562-fe83e897a07a" license="MIT" modelName="SensorMultiRate" numberOfEventIndicators="0" variableNamingConvention="flat">
+<?xml version="1.0" encoding="UTF-8"?><fmiModelDescription copyright="Aarhus University and University of Antwerpen" fmiVersion="2.0" generationTool="BaseSA" guid="eb91d185-ba57-4db9-a3c1-584557c2c434" license="MIT" modelName="SensorMultiRate" numberOfEventIndicators="0" variableNamingConvention="flat">
     <CoSimulation canBeInstantiatedOnlyOncePerProcess="true" canGetAndSetFMUstate="true" canHandleVariableCommunicationStepSize="true" canInterpolateInputs="true" canNotUseMemoryManagementFunctions="true" canRunAsynchronuously="false" canSerializeFMUstate="false" maxOutputDerivativeOrder="0" modelIdentifier="SensorMultiRate" needsExecutionTool="false" providesDirectionalDerivative="false"/>
     <LogCategories>
         <Category name="logAll"/>
@@ -7,8 +7,8 @@
         <Category name="logEvent"/>
     </LogCategories>
     <ModelVariables>
-        <ScalarVariable causality="input" name="f" valueReference="0" variability="discrete">
-            <Integer/>
+        <ScalarVariable causality="input" name="f" valueReference="0" variability="continuous">
+            <Real start="0.0"/>
         </ScalarVariable>
         <ScalarVariable causality="output" name="x_aft" valueReference="1" variability="continuous">
             <Real/>

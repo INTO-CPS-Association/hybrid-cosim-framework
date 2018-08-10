@@ -102,7 +102,7 @@
 							shared_ptr<FmuComponent> sensor;
 							
 							struct InternalState {
-								int f;
+								double f;
 								bool isSetf;
 								double x_aft;
 								double v;
@@ -113,12 +113,12 @@
 								double INIT_X_AFT;
 								double INIT_V;
 								double INIT_X;
-								int current_f;
+								double current_f;
 								double stored__f;
-								double stored__v;
 								double stored__x_aft;
+								double stored__v;
 								double stored__x;
-								int previous_f;
+								double previous_f;
 							};
 							
 							InternalState internalState;

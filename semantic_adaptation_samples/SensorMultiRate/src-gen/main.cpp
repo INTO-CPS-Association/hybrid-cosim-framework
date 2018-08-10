@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 	fmi2CallbackFunctions callback = { &fmuLoggerCache, NULL, NULL, NULL, NULL };
 	fmi2Component comp =
 			fmi2Instantiate("this system", fmi2CoSimulation, "{1234}",
-					"D:\\srcctrl\\into-cps-organization\\hybridCosimulation-framework\\semantic_adaptation_samples\\SensorMultiRate",
+					"C:\\srcctrl\\into-cps-organization\\hybridCosimulation-framework\\semantic_adaptation_samples\\SensorMultiRate",
 					&callback, fmi2True,
 					fmi2True);
 
@@ -78,8 +78,9 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-#define ID_PSUVOLT_OUT 0
-#define ID_REF_OUT 1
+#define ID_XOUT 268435456
+#define ID_VOUT 268435457
+#define ID_XAFTOUT 268435458
 
 	std::fstream fs;
 
@@ -87,16 +88,17 @@ int main(int argc, char *argv[]) {
 	double stepSize = 0.01;
 
 	for (double time = 0.0; time < stepSize; time += stepSize) {
-		
+
 		if (fmi2DoStep(comp, time, stepSize, false)!= fmi2OK) {
 			printf("Errorin do step");
 			return 1;
 		}
-		
-		auto disp = getReal(comp, ID_PSUVOLT_OUT);
-		auto tau = getReal(comp, ID_REF_OUT);
-		
-		cout << "time: " << time << " psuvolt: " << disp << " tau: " << tau
+
+		auto xout = getReal(comp, ID_XOUT);
+		auto vout = getReal(comp, ID_VOUT);
+		auto xaft = getReal(comp, ID_XAFTOUT);
+
+		cout << "time: " << time << " x: " << ID_XOUT << " vout: " << vout << " xaft: " << xaft
 				<< endl;
 	}
 
