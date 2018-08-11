@@ -17,8 +17,8 @@
 					this->internalState.RATE = 10;
 					this->internalState.INIT_PSUVOLT = 0.0;
 					this->internalState.INIT_REF = 0.0;
-					this->internalState.stored__psuvolt = this->internalState.INIT_PSUVOLT;
 					this->internalState.stored__ref = this->internalState.INIT_REF;
+					this->internalState.stored__psuvolt = this->internalState.INIT_PSUVOLT;
 				}
 				
 				void RateConstants::initialize(bool loggingOn)
@@ -135,22 +135,22 @@
 					#endif	
 				}
 				
-				bool RateConstants::in_rule_condition1(double dt, double h){
+				bool RateConstants::in_rule_condition1(double dt, double H, double h){
 					#ifdef SA_DEBUG
-						printf("Invoking bool RateConstants::in_rule_condition1(double dt, double h)");
+						printf("Invoking bool RateConstants::in_rule_condition1(double dt, double H, double h)");
 						printf("\n");
 					#endif	
 					return true;
 				}
-				void RateConstants::in_rule_body1(double dt, double h){
+				void RateConstants::in_rule_body1(double dt, double H, double h){
 					#ifdef SA_DEBUG
-						printf("Invoking void RateConstants::in_rule_body1(double dt, double h)");
+						printf("Invoking void RateConstants::in_rule_body1(double dt, double H, double h)");
 						printf("\n");
 					#endif	
 				}
-				void RateConstants::in_rule_flush1(double dt, double h){
+				void RateConstants::in_rule_flush1(double dt, double H, double h){
 					#ifdef SA_DEBUG
-						printf("Invoking void RateConstants::in_rule_flush1(double dt, double h)");
+						printf("Invoking void RateConstants::in_rule_flush1(double dt, double H, double h)");
 						printf("\n");
 					#endif	
 				}
@@ -181,35 +181,35 @@
 					inner_time = t;
 					micro_step = H / this->internalState.RATE;
 					for (int iter = 0; iter<=this->internalState.RATE; iter++){
-						this->do_step(constants,micro_step,inner_time);
+						this->do_step(constants,inner_time,inner_time-t,micro_step);;
 						inner_time = inner_time + micro_step;
 					}
 					
 					return H;
 				}
 				
-				bool RateConstants::out_rule_condition1(double dt, double h){
+				bool RateConstants::out_rule_condition1(double dt, double H, double h){
 					#ifdef SA_DEBUG
-						printf("Invoking bool RateConstants::out_rule_condition1(double dt, double h)");
+						printf("Invoking bool RateConstants::out_rule_condition1(double dt, double H, double h)");
 						printf("\n");
 					#endif	
 					return true;
 				}
-				void RateConstants::out_rule_body1(double dt, double h){
+				void RateConstants::out_rule_body1(double dt, double H, double h){
 					#ifdef SA_DEBUG
-						printf("Invoking void RateConstants::out_rule_body1(double dt, double h)");
+						printf("Invoking void RateConstants::out_rule_body1(double dt, double H, double h)");
 						printf("\n");
 					#endif	
-					this->internalState.stored__psuvolt = getValueDouble(constants,CONSTANTSPSUVOLT);
 					this->internalState.stored__ref = getValueDouble(constants,CONSTANTSREF);
+					this->internalState.stored__psuvolt = getValueDouble(constants,CONSTANTSPSUVOLT);
 				}
-				void RateConstants::out_rule_flush1(double dt, double h){
+				void RateConstants::out_rule_flush1(double dt, double H, double h){
 					#ifdef SA_DEBUG
-						printf("Invoking void RateConstants::out_rule_flush1(double dt, double h)");
+						printf("Invoking void RateConstants::out_rule_flush1(double dt, double H, double h)");
 						printf("\n");
 					#endif	
-					this->internalState.psuvolt = this->internalState.stored__psuvolt;
 					this->internalState.ref = this->internalState.stored__ref;
+					this->internalState.psuvolt = this->internalState.stored__psuvolt;
 				}
 				shared_ptr<list<Rule<RateConstants>>> RateConstants::createOutputRules()
 				{

@@ -74,7 +74,7 @@ public:
 	virtual void initialize(bool loggingOn)=0;
 	virtual ~SemanticAdaptation();
 
-	virtual fmi2Status executeControlFlow(double h, double dt) final;
+	virtual fmi2Status executeControlFlow(double t, double H) final;
 	fmi2Status executeInRules();
 	fmi2Status executeOutRules(bool ignoreEnabledCheck = false);
 
