@@ -82,15 +82,15 @@
 							RateConstants* getRuleThis();
 							
 							/*in rules*/
-							bool in_rule_condition1(double dt, double h);
-							void in_rule_body1(double dt, double h);
-							void in_rule_flush1(double dt, double h);
+							bool in_rule_condition1(double dt, double H, double h);
+							void in_rule_body1(double dt, double H, double h);
+							void in_rule_flush1(double dt, double H, double h);
 							shared_ptr<list<Rule<RateConstants>>> createInputRules();
 							
 							/*out rules*/
-							bool out_rule_condition1(double dt, double h);
-							void out_rule_body1(double dt, double h);
-							void out_rule_flush1(double dt, double h);
+							bool out_rule_condition1(double dt, double H, double h);
+							void out_rule_body1(double dt, double H, double h);
+							void out_rule_flush1(double dt, double H, double h);
 							shared_ptr<list<Rule<RateConstants>>> createOutputRules();
 							
 							double executeInternalControlFlow(double t, double H);
@@ -104,8 +104,8 @@
 								int RATE;
 								double INIT_PSUVOLT;
 								double INIT_REF;
-								double stored__psuvolt;
 								double stored__ref;
+								double stored__psuvolt;
 							};
 							
 							InternalState internalState;

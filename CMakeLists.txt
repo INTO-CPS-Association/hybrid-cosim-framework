@@ -29,6 +29,8 @@ enable_testing()
 #set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_COLOR_MAKEFILE   ON)
 
+#add_definitions(-DSA_DEBUG) #Enable debugging
+
 if (WIN32)
 	#windows, becuase windows just cannot figure out to do it correct. 
 	# must be a bug in msys mingw gcc 6.3	
