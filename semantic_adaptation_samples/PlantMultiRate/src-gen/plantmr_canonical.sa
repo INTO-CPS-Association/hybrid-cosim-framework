@@ -1,0 +1,78 @@
+semantic adaptation reactive moore PlantMultiRate
+at "./PlantMultiRate.fmu"
+
+	for inner fmu Plant plant
+		at "./EMAPlantNoLoad_FixedEuler_1Em6.fmu"
+		with input ports 
+			Real torque "torque_input@expseu_", 
+			Real psu "psu_vol_input_v@expseu_", 
+			Real v "V_IN@expseu_", 
+			Real x "X_IN@expseu_" 
+		with output ports 
+			Real w "ang_vel_out_rpm@expseu_", 
+			Real f "F_OUT@expseu_"
+
+input ports Real torque , 
+			Real psu , 
+			Real v , 
+			Real x output ports Real w , Real f
+
+param Integer RATE := 10 , Real INIT_TORQUE := 0.0 , Real INIT_PSU := 0.0 , Real INIT_V := 0.0 , Real INIT_X := 0.0 , Real INIT_W := 0.0 , Real INIT_F := 0.0 ; 
+
+control var Real previous_torque := 0.0, Real
+			previous_psu := 0.0, Real
+			previous_v := 0.0, Real
+			previous_x := 0.0;
+
+control rules {
+	var Real micro_step := 0.0;
+	var Real inner_time := 0.0;
+	
+	inner_time := t;
+	
+	micro_step := H/RATE;
+	
+	for (var iter in 0 .. RATE) {
+		do_step(plant, inner_time, micro_step);
+		inner_time := inner_time + micro_step;	
+	}
+	
+	previous_torque := current_torque;
+	previous_psu := current_psu;
+	previous_v := current_v;
+	previous_x := current_x;
+	
+	return H;
+}
+
+in var Real current_torque := 0.0, Real 
+		current_psu := 0.0, Real
+		current_v := 0.0, Real
+		current_x := 0.0 , Real stored__psu := INIT_PSU , Real stored__x := INIT_X , Real stored__v := INIT_V , Real stored__torque := INIT_TORQUE ;
+in rules {
+	true -> {
+stored__v := PlantMultiRate . v ;
+stored__psu := PlantMultiRate . psu ;
+stored__torque := PlantMultiRate . torque ;
+stored__x := PlantMultiRate . x ;
+		current_torque := torque;
+		current_psu := psu;
+		current_x := x;
+		current_v := v;
+	} --> {
+plant . x := stored__x ;
+plant . torque := stored__torque ;
+plant . v := stored__v ;
+plant . psu := stored__psu ;
+		plant.torque := previous_torque + ((current_torque - previous_torque)/H)*dt ;
+		plant.psu := previous_psu + ((current_psu - previous_psu)/H)*dt ;
+		plant.x := previous_x + ((current_x - previous_x)/H)*dt ;
+		plant.v := previous_v + ((current_v - previous_v)/H)*dt ;
+	};
+}
+out var Real stored__w := INIT_W , Real stored__f := INIT_F ; out rules {
+true -> {
+stored__w := plant . w ;
+stored__f := plant . f ; } --> {
+PlantMultiRate . w := stored__w ;
+PlantMultiRate . f := stored__f ; } ; }
