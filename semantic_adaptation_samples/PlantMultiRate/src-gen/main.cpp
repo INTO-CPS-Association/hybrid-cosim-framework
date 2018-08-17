@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 	fmi2CallbackFunctions callback = { &fmuLoggerCache, NULL, NULL, NULL, NULL };
 	fmi2Component comp =
 			fmi2Instantiate("this system", fmi2CoSimulation, "{1234}",
-					"D:\\srcctrl\\into-cps-organization\\hybridCosimulation-framework\\semantic_adaptation_samples\\SensorMultiRate",
+					"D:\\srcctrl\\into-cps-organization\\hybridCosimulation-framework\\semantic_adaptation_samples\\PlantMultiRate",
 					&callback, fmi2True,
 					fmi2True);
 
@@ -73,21 +73,10 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 	
-#define ID_FIN 0
-
-	if (setReal(comp, ID_FIN, 0.0) != fmi2OK) {
-		printf("Error setReal");
-		return 1;
-	}
-	
 	if (fmi2ExitInitializationMode(comp) != fmi2OK) {
 		printf("Error fmi2SetupExperiment");
 		return 1;
 	}
-
-#define ID_XOUT 3
-#define ID_VOUT 2
-#define ID_XAFTOUT 1
 
 	std::fstream fs;
 
@@ -96,21 +85,21 @@ int main(int argc, char *argv[]) {
 
 	for (double time = 0.0; time < 2*stepSize; time += stepSize) {
 		
-		if (setReal(comp, ID_FIN, time) != fmi2OK) { // + stepSize
+		/*if (setReal(comp, ID_FIN, time + stepSize) != fmi2OK) {
 			printf("Error setReal");
 			return 1;
-		}
+		}*/
 		
 		if (fmi2DoStep(comp, time, stepSize, false)!= fmi2OK) {
 			printf("Errorin do step");
 			return 1;
 		}
 
-		auto xout = getReal(comp, ID_XOUT);
-		auto vout = getReal(comp, ID_VOUT);
-		auto xaft = getReal(comp, ID_XAFTOUT);
+		//auto xout = getReal(comp, ID_XOUT);
+		//auto vout = getReal(comp, ID_VOUT);
+		//auto xaft = getReal(comp, ID_XAFTOUT);
 
-		cout << "time: " << time + stepSize << " x: " << ID_XOUT << " vout: " << vout << " xaft: " << xaft
+		cout << "time: " << time + stepSize //<< " x: " << ID_XOUT << " vout: " << vout << " xaft: " << xaft
 				<< endl;
 	}
 
