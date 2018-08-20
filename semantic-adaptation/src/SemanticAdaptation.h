@@ -213,6 +213,10 @@ fmi2Status SemanticAdaptation<T>::executeInRules()
 {
 	//http://stackoverflow.com/questions/2898316/using-a-member-function-pointer-within-a-class
 	
+	// TODO: This code is called via FMU.DoStep, which may cause it to add duplicate rules to the this->enablesInRules list.
+	// I've added a clear to this list, to workarround this issue, but a more correct implementation needs to avoid duplicates in the list.
+	this->enablesInRules->clear();
+	
 	for (auto itr = this->inRules->begin(), end = this->inRules->end(); itr != end; ++itr)
 	{
 		Rule<T> rule = *itr;
@@ -232,7 +236,7 @@ fmi2Status SemanticAdaptation<T>::executeInRules()
 
 template<class T>
 fmi2Status SemanticAdaptation<T>::executeOutRules()
-{
+{	
 	for (auto itr = this->outRules->begin(), end = this->outRules->end(); itr != end; ++itr)
 	{
 		Rule<T> rule = *itr;
