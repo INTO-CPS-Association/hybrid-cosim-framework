@@ -78,27 +78,19 @@ namespace adaptation
 				double w;
 				double f;
 				
-				int RATE;
+				double RATE;
 				double INIT_TORQUE;
 				double INIT_PSU;
 				double INIT_V;
 				double INIT_X;
 				double INIT_W;
 				double INIT_F;
-				double current_torque;
-				double current_psu;
-				double current_v;
-				double current_x;
+				double stored__torque;
 				double stored__psu;
 				double stored__x;
 				double stored__v;
-				double stored__torque;
 				double stored__w;
 				double stored__f;
-				double previous_torque;
-				double previous_psu;
-				double previous_v;
-				double previous_x;
 			};
 			
 			InternalState internalState;

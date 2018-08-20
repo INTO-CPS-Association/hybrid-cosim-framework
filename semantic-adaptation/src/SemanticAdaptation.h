@@ -299,7 +299,7 @@ fmi2Status SemanticAdaptation<T>::executeControlFlow(double t, double H)
 	this->lasth = 0.0;
 	
 	//flush all enabled in-rules
-	flushAllEnabledInRules();
+	// flushAllEnabledInRules();
 
 	lastSuccessfulTime = executeInternalControlFlow(t, H);
 

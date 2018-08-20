@@ -69,17 +69,15 @@ namespace adaptation
 				double v;
 				double x;
 				
-				int RATE;
+				double RATE;
 				double INIT_F;
 				double INIT_X_AFT;
 				double INIT_V;
 				double INIT_X;
-				double current_f;
 				double stored__f;
-				double stored__x;
 				double stored__v;
+				double stored__x;
 				double stored__x_aft;
-				double previous_f;
 			};
 			
 			InternalState internalState;
