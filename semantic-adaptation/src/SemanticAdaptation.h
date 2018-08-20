@@ -76,15 +76,13 @@ public:
 
 	virtual fmi2Status executeControlFlow(double t, double H) final;
 	fmi2Status executeInRules();
-	fmi2Status executeOutRules(bool ignoreEnabledCheck = false);
+	fmi2Status executeOutRules();
 
 	enum MooreOrMealy
 	{	Moore,Mealy};
 
 	enum ReactiveOrDelayed
 	{	Reactive, Delayed};
-
-	fmi2Status flushAllEnabledOutRules();
 
 	fmi2Status getLastErrorState();
 	shared_ptr<std::string> getLastErrorMessage();
@@ -153,7 +151,6 @@ private:
 	shared_ptr<std::list<Rule<T>>> outRules;
 
 	shared_ptr<std::list<Rule<T>>> enablesInRules;
-	shared_ptr<std::list<Rule<T>>> enablesOutRules;
 
 	void flushAllEnabledInRules();
 
@@ -194,7 +191,6 @@ SemanticAdaptation<T>::SemanticAdaptation(shared_ptr<std::string> fmiInstanceNam
 	this->fmiFunctions = functions;
 
 	this->enablesInRules = make_shared<std::list<Rule<T>>>();
-	this->enablesOutRules = make_shared<std::list<Rule<T>>>();
 	this->instances = make_shared<std::list<shared_ptr<FmuComponent>>>();
 	this->instanceStates = make_shared<std::map<fmi2Component,std::vector<fmi2FMUstate>>>();
 
@@ -216,6 +212,7 @@ template<class T>
 fmi2Status SemanticAdaptation<T>::executeInRules()
 {
 	//http://stackoverflow.com/questions/2898316/using-a-member-function-pointer-within-a-class
+	
 	for (auto itr = this->inRules->begin(), end = this->inRules->end(); itr != end; ++itr)
 	{
 		Rule<T> rule = *itr;
@@ -225,7 +222,7 @@ fmi2Status SemanticAdaptation<T>::executeInRules()
 			if (this->machineType == Mealy)
 			{
 				((*getRuleThis()).*rule.flush)(this->lastDt, this->lastH, this->lasth);
-				this->executeOutRules(true);
+				this->executeOutRules();
 			}
 			this->enablesInRules->push_back(*itr);
 		}
@@ -234,25 +231,18 @@ fmi2Status SemanticAdaptation<T>::executeInRules()
 }
 
 template<class T>
-fmi2Status SemanticAdaptation<T>::executeOutRules(bool ignoreEnabledCheck)
+fmi2Status SemanticAdaptation<T>::executeOutRules()
 {
-	//if (this->enablesOutRules->size() > 0 && !ignoreEnabledCheck)
-	//{
-		//not sure why
-		//return fmi2OK;
-	//}
-
 	for (auto itr = this->outRules->begin(), end = this->outRules->end(); itr != end; ++itr)
 	{
 		Rule<T> rule = *itr;
 		if (((*getRuleThis()).*rule.condition)(this->lastDt, this->lastH, this->lasth))
 		{
 			((*getRuleThis()).*rule.body)(this->lastDt, this->lastH, this->lasth);
-			if (this->machineType == Mealy)
+			//if (this->machineType == Mealy) // Always flushes: there's no distinction between mealy and moore here.
 			{
 				((*getRuleThis()).*rule.flush)(this->lastDt, this->lastH, this->lasth);
 			}
-			this->enablesOutRules->push_back(*itr);
 		}
 	}
 
@@ -271,19 +261,6 @@ void SemanticAdaptation<T>::flushAllEnabledInRules()
 }
 
 template<class T>
-fmi2Status SemanticAdaptation<T>::flushAllEnabledOutRules()
-{
-	for (auto itr = this->enablesOutRules->begin(), end = this->enablesOutRules->end(); itr != end; ++itr)
-	{
-		Rule<T> rule = *itr;
-		((*getRuleThis()).*rule.flush)(this->lastDt, this->lastH, this->lasth);
-
-	}
-
-	return this->lastErrorState;
-}
-
-template<class T>
 double SemanticAdaptation<T>::getLastSuccessfulTime()
 {
 	return this->lastSuccessfulTime;
@@ -292,19 +269,11 @@ double SemanticAdaptation<T>::getLastSuccessfulTime()
 template<class T>
 fmi2Status SemanticAdaptation<T>::executeControlFlow(double t, double H)
 {
-	this->enablesOutRules->clear();
-	
 	this->lastDt = 0.0;
 	this->lastH = H;
 	this->lasth = 0.0;
 	
-	//flush all enabled in-rules
-	// flushAllEnabledInRules();
-
 	lastSuccessfulTime = executeInternalControlFlow(t, H);
-
-	//execute the body of all out-rules with a true condition and enable them
-	//executeOutRules();
 
 	this->enablesInRules->clear();
 	return this->lastErrorState;
