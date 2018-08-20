@@ -30,6 +30,7 @@ void fmuLoggerCache(void *componentEnvironment, fmi2String instanceName,
 
 	cout << "FROM MAIN: Name: " << instanceName << " Status: " << status << " Category: "
 			<< category << " Msg: " << completeMessage << endl;
+	
 }
 
 fmi2Status setReal(fmi2Component comp, fmi2ValueReference id, fmi2Real val) {
@@ -56,7 +57,7 @@ int main(int argc, char *argv[]) {
 			fmi2Instantiate("this system", fmi2CoSimulation, "{1234}",
 					"D:\\srcctrl\\into-cps-organization\\hybridCosimulation-framework\\semantic_adaptation_samples\\PlantMultiRate",
 					&callback, fmi2True,
-					fmi2True);
+					fmi2True); // logging
 
 	if (comp == NULL) {
 		cout << "init failed" << endl;
@@ -81,25 +82,52 @@ int main(int argc, char *argv[]) {
 	std::fstream fs;
 
 	double time = 0.0;
-	double stepSize = 0.01;
+	double stepSize = 1e-2;
 
+	
+#define ID_T_IN 0
+#define ID_P_IN 1
+#define ID_V_IN 2
+#define ID_X_IN 3
+
+#define ID_W_OUT 4
+#define ID_F_OUT 5
+	
+	
+	auto wout = getReal(comp, ID_W_OUT);
+	auto fout = getReal(comp, ID_F_OUT);
+
+	cout << "time: " << 0.0 << " w: " << wout << " fout: " << fout
+			<< endl;
+	
 	for (double time = 0.0; time < 2*stepSize; time += stepSize) {
 		
-		/*if (setReal(comp, ID_FIN, time + stepSize) != fmi2OK) {
+		if (setReal(comp, ID_T_IN, 1.0) != fmi2OK) {
 			printf("Error setReal");
 			return 1;
-		}*/
+		}
+		if (setReal(comp, ID_P_IN, 1.0) != fmi2OK) {
+			printf("Error setReal");
+			return 1;
+		}
+		if (setReal(comp, ID_V_IN, 1.0) != fmi2OK) {
+			printf("Error setReal");
+			return 1;
+		}
+		if (setReal(comp, ID_X_IN, 1.0) != fmi2OK) {
+			printf("Error setReal");
+			return 1;
+		}
 		
 		if (fmi2DoStep(comp, time, stepSize, false)!= fmi2OK) {
 			printf("Errorin do step");
 			return 1;
 		}
 
-		//auto xout = getReal(comp, ID_XOUT);
-		//auto vout = getReal(comp, ID_VOUT);
-		//auto xaft = getReal(comp, ID_XAFTOUT);
+		auto wout = getReal(comp, ID_W_OUT);
+		auto fout = getReal(comp, ID_F_OUT);
 
-		cout << "time: " << time + stepSize //<< " x: " << ID_XOUT << " vout: " << vout << " xaft: " << xaft
+		cout << "time: " << time + stepSize << " w: " << wout << " fout: " << fout
 				<< endl;
 	}
 

@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
 
 	for (double time = 0.0; time < 2*stepSize; time += stepSize) {
 		
-		if (setReal(comp, ID_FIN, time) != fmi2OK) { // + stepSize
+		if (setReal(comp, ID_FIN, time + stepSize) != fmi2OK) { // 
 			printf("Error setReal");
 			return 1;
 		}
