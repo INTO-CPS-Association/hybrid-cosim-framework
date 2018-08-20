@@ -236,11 +236,11 @@ fmi2Status SemanticAdaptation<T>::executeInRules()
 template<class T>
 fmi2Status SemanticAdaptation<T>::executeOutRules(bool ignoreEnabledCheck)
 {
-	if (this->enablesOutRules->size() > 0 && !ignoreEnabledCheck)
-	{
+	//if (this->enablesOutRules->size() > 0 && !ignoreEnabledCheck)
+	//{
 		//not sure why
-		return fmi2OK;
-	}
+		//return fmi2OK;
+	//}
 
 	for (auto itr = this->outRules->begin(), end = this->outRules->end(); itr != end; ++itr)
 	{
@@ -304,7 +304,7 @@ fmi2Status SemanticAdaptation<T>::executeControlFlow(double t, double H)
 	lastSuccessfulTime = executeInternalControlFlow(t, H);
 
 	//execute the body of all out-rules with a true condition and enable them
-	executeOutRules();
+	//executeOutRules();
 
 	this->enablesInRules->clear();
 	return this->lastErrorState;
@@ -381,7 +381,7 @@ template<class T>
 double SemanticAdaptation<T>::do_step(shared_ptr<FmuComponent> fmuComp, double t, double dt, double h)
 {
 #ifdef SA_DEBUG
-	printf("Calling doStep on %s,%p, comminicationPoint=%f, stepsize=%f\n",fmuComp->fmu->getPath()->c_str(),fmuComp->component,t,h);
+	printf("Calling doStep on %s,%p, communicationpoint=%lf, stepsize=%lf, dt=%lf \n",fmuComp->fmu->getPath()->c_str(),fmuComp->component,t,h,dt);
 #endif
 	
 	this->lastDt = dt;
@@ -417,7 +417,7 @@ double SemanticAdaptation<T>::do_step(shared_ptr<FmuComponent> fmuComp, double t
 	status = this->executeOutRules();
 	if (status != fmi2OK)
 	{
-		cerr << "do_step-executeOutRiles failed: t: " << t << " h: " << h << " " << status << endl;
+		cerr << "do_step->executeOutRules failed: t: " << t << " h: " << h << " " << status << endl;
 		this->lastErrorState = status;
 		THROW_STATUS_EXCEPTION;
 	}
