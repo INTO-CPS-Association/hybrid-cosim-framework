@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><fmiModelDescription copyright="Aarhus University and University of Antwerpen" fmiVersion="2.0" generationTool="BaseSA" guid="dff3a719-c442-4e32-ab4a-f1608fe2ec4c" license="MIT" modelName="CtrlMultiRate" numberOfEventIndicators="0" variableNamingConvention="flat">
+    <CoSimulation canBeInstantiatedOnlyOncePerProcess="true" canGetAndSetFMUstate="true" canHandleVariableCommunicationStepSize="true" canInterpolateInputs="true" canNotUseMemoryManagementFunctions="true" canRunAsynchronuously="false" canSerializeFMUstate="false" maxOutputDerivativeOrder="0" modelIdentifier="CtrlMultiRate" needsExecutionTool="false" providesDirectionalDerivative="false"/>
+    <LogCategories>
+        <Category name="logAll"/>
+        <Category name="logError"/>
+        <Category name="logFmiCall"/>
+        <Category name="logEvent"/>
+    </LogCategories>
+    <ModelVariables>
+        <ScalarVariable causality="input" name="v" valueReference="0" variability="continuous">
+            <Real start="0.0"/>
+        </ScalarVariable>
+        <ScalarVariable causality="input" name="x" valueReference="1" variability="continuous">
+            <Real start="0.0"/>
+        </ScalarVariable>
+        <ScalarVariable causality="input" name="ref" valueReference="2" variability="continuous">
+            <Real start="0.0"/>
+        </ScalarVariable>
+        <ScalarVariable causality="output" name="o" valueReference="3" variability="continuous">
+            <Real/>
+        </ScalarVariable>
+    </ModelVariables>
+    <ModelStructure>
+        <Outputs>
+            <Unknown dependencies="" index="4"/>
+        </Outputs>
+    </ModelStructure>
+</fmiModelDescription>
