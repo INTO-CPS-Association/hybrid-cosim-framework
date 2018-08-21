@@ -12,22 +12,22 @@ at "./PlantMultiRate.fmu"
 			Real w "ang_vel_out_rpm@expseu_", 
 			Real f "F_OUT@expseu_"
 
-//input ports Real torque -> plant.torque, 
-//			Real psu -> plant.psu
-			//Real v -> plant.v, 
-			//Real x -> plant.x
+input ports Real torque -> plant.torque ,
+			//Real psu -> plant.psu
+			Real v -> plant.v, 
+			Real x -> plant.x
 
-param Real RATE := 1.0;
+param Real RATE := 2.0;
 
-//control var previous_torque := 0.0,
-//			previous_psu := 0.0;
-			//previous_v := 0.0,
-			//previous_x := 0.0;
+control var previous_torque := 0.0,
+			//previous_psu := 0.0;
+			previous_v := 0.0,
+			previous_x := 0.0;
 
 control rules {
 	var micro_step := 0.0;
 	var inner_time := 0.0;
-//	
+
 	inner_time := t;
 	
 	micro_step := H/RATE;
@@ -37,28 +37,29 @@ control rules {
 		inner_time := inner_time + micro_step;	
 	}
 
-	//previous_torque := current_torque;
+	previous_torque := current_torque;
 	//previous_psu := current_psu;
-	//previous_v := current_v;
-	//previous_x := current_x;
+	previous_v := current_v;
+	previous_x := current_x;
 	
 	return H;
 }
 
-//in var current_torque := 0.0, 
-//		current_psu := 0.0;
-		//current_v := 0.0,
-		//current_x := 0.0;
-//in rules {
-//	true -> {
-		//current_torque := torque;
+in var current_torque := 0.0,
+		//current_psu := 0.0;
+		current_v := 0.0,
+		current_x := 0.0;
+in rules {
+	true -> {
+		current_torque := torque;
 		//current_psu := psu;
-		//current_x := x;
-		//current_v := v;
-//	} --> {
-		//plant.torque := previous_torque + ((current_torque - previous_torque)/H)*dt ;
+		current_x := x;
+		current_v := v;
+	} --> {
+		//plant.torque := previous_torque + ((current_torque - previous_torque)/H)*(dt+h) ;
+		plant.torque := current_torque;
 		//plant.psu := previous_psu + ((current_psu - previous_psu)/H)*dt ;
-		//plant.x := previous_x + ((current_x - previous_x)/H)*dt ;
-		//plant.v := previous_v + ((current_v - previous_v)/H)*dt ;
-//	};
-//}
+		plant.x := previous_x + ((current_x - previous_x)/H)*(H + dt + h) ;
+		plant.v := previous_v + ((current_v - previous_v)/H)*(H + dt + h) ;
+	};
+}
