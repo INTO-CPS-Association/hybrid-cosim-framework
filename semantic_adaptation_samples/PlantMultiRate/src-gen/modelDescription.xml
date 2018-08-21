@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><fmiModelDescription copyright="Aarhus University and University of Antwerpen" fmiVersion="2.0" generationTool="BaseSA" guid="84ea5b72-066d-40ba-b9b8-6f7807607f58" license="MIT" modelName="PlantMultiRate" numberOfEventIndicators="0" variableNamingConvention="flat">
+<?xml version="1.0" encoding="UTF-8"?><fmiModelDescription copyright="Aarhus University and University of Antwerpen" fmiVersion="2.0" generationTool="BaseSA" guid="855ffa51-941d-45ea-87ad-eb4ec28bc5a1" license="MIT" modelName="PlantMultiRate" numberOfEventIndicators="0" variableNamingConvention="flat">
     <CoSimulation canBeInstantiatedOnlyOncePerProcess="true" canGetAndSetFMUstate="true" canHandleVariableCommunicationStepSize="true" canInterpolateInputs="true" canNotUseMemoryManagementFunctions="true" canRunAsynchronuously="false" canSerializeFMUstate="false" maxOutputDerivativeOrder="0" modelIdentifier="PlantMultiRate" needsExecutionTool="false" providesDirectionalDerivative="false"/>
     <LogCategories>
         <Category name="logAll"/>
@@ -10,13 +10,13 @@
         <ScalarVariable causality="input" name="torque" valueReference="0" variability="continuous">
             <Real start="0.0"/>
         </ScalarVariable>
-        <ScalarVariable causality="input" name="psu" valueReference="1" variability="continuous">
+        <ScalarVariable causality="input" name="v" valueReference="1" variability="continuous">
             <Real start="0.0"/>
         </ScalarVariable>
-        <ScalarVariable causality="input" name="v" valueReference="2" variability="continuous">
+        <ScalarVariable causality="input" name="x" valueReference="2" variability="continuous">
             <Real start="0.0"/>
         </ScalarVariable>
-        <ScalarVariable causality="input" name="x" valueReference="3" variability="continuous">
+        <ScalarVariable causality="input" name="psu" valueReference="3" variability="continuous">
             <Real start="0.0"/>
         </ScalarVariable>
         <ScalarVariable causality="output" name="w" valueReference="4" variability="continuous">

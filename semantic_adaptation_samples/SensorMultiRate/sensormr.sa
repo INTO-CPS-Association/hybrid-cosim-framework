@@ -6,11 +6,11 @@ at "./SensorMultiRate.fmu"
 		with input ports Real f "F_INPUT@expseu_"
 		with output ports Real x_aft "X_AFTER_LOAD@expseu_", Real v "V_OUTPUT@expseu_", Real x "X_OUTPUT@expseu_"
 
-//input ports Real f -> sensor.f
+input ports Real f -> sensor.f
 
-param Real RATE := 1.0; 
+param Real RATE := 10.0; 
 
-//control var previous_f := 0.0;
+control var previous_f := 0.0;
 
 control rules {
 	var micro_step := 0.0;
@@ -25,16 +25,16 @@ control rules {
 		inner_time := inner_time + micro_step;	
 	}
 	
-//	previous_f := current_f;
+	previous_f := current_f;
 	
 	return H;
 }
 
-//in var current_f := 0.0;
-//in rules {
-//	true -> {
-//		current_f := f;
-//	} --> {
-//		sensor.f := previous_f + ((current_f - previous_f)/H)*dt ;
-//	};
-//}
+in var current_f := 0.0;
+in rules {
+	true -> {
+		current_f := f;
+	} --> {
+		sensor.f := previous_f + ((current_f - previous_f)/H)*(dt+h);
+	};
+}

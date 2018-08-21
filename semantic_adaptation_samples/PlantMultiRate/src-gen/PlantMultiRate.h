@@ -19,9 +19,9 @@ namespace adaptation
 	#define PLANTF 268435457
 
 	#define PLANTMULTIRATETORQUE 0
-	#define PLANTMULTIRATEPSU 1
-	#define PLANTMULTIRATEV 2
-	#define PLANTMULTIRATEX 3
+	#define PLANTMULTIRATEV 1
+	#define PLANTMULTIRATEX 2
+	#define PLANTMULTIRATEPSU 3
 	#define PLANTMULTIRATEW 4
 	#define PLANTMULTIRATEF 5
 
@@ -69,28 +69,34 @@ namespace adaptation
 			struct InternalState {
 				double torque;
 				bool isSettorque;
-				double psu;
-				bool isSetpsu;
 				double v;
 				bool isSetv;
 				double x;
 				bool isSetx;
+				double psu;
+				bool isSetpsu;
 				double w;
 				double f;
 				
 				double RATE;
 				double INIT_TORQUE;
-				double INIT_PSU;
 				double INIT_V;
 				double INIT_X;
+				double INIT_PSU;
 				double INIT_W;
 				double INIT_F;
-				double stored__psu;
+				double current_torque;
+				double current_v;
+				double current_x;
 				double stored__x;
-				double stored__v;
+				double stored__psu;
 				double stored__torque;
+				double stored__v;
 				double stored__w;
 				double stored__f;
+				double previous_torque;
+				double previous_v;
+				double previous_x;
 			};
 			
 			InternalState internalState;

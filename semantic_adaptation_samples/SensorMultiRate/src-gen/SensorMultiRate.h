@@ -74,10 +74,12 @@ namespace adaptation
 				double INIT_X_AFT;
 				double INIT_V;
 				double INIT_X;
+				double current_f;
 				double stored__f;
-				double stored__x_aft;
 				double stored__v;
 				double stored__x;
+				double stored__x_aft;
+				double previous_f;
 			};
 			
 			InternalState internalState;
