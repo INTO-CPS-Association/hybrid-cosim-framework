@@ -85,10 +85,10 @@ namespace adaptation
 				double INIT_X;
 				double INIT_W;
 				double INIT_F;
-				double stored__torque;
 				double stored__psu;
 				double stored__x;
 				double stored__v;
+				double stored__torque;
 				double stored__w;
 				double stored__f;
 			};

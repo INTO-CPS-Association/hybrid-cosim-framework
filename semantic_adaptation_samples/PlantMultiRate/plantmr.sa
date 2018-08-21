@@ -17,7 +17,7 @@ at "./PlantMultiRate.fmu"
 			//Real v -> plant.v, 
 			//Real x -> plant.x
 
-param Real RATE := 2.0;
+param Real RATE := 1.0;
 
 //control var previous_torque := 0.0,
 //			previous_psu := 0.0;

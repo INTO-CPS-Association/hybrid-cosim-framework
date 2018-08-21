@@ -75,9 +75,9 @@ namespace adaptation
 				double INIT_V;
 				double INIT_X;
 				double stored__f;
+				double stored__x_aft;
 				double stored__v;
 				double stored__x;
-				double stored__x_aft;
 			};
 			
 			InternalState internalState;
