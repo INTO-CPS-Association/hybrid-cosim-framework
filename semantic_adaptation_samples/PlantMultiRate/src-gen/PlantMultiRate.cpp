@@ -5,17 +5,17 @@ namespace adaptation
 	PlantMultiRate::PlantMultiRate(shared_ptr<std::string> fmiInstanceName,shared_ptr<string> resourceLocation, const fmi2CallbackFunctions* functions) : 
 	SemanticAdaptation(fmiInstanceName, resourceLocation, createInputRules(), createOutputRules(), functions)
 	{			
-		this->internalState.RATE = 2.0;
+		this->internalState.RATE = 1.0;
 		this->internalState.INIT_TORQUE = 0.0;
 		this->internalState.INIT_PSU = 0.0;
 		this->internalState.INIT_V = 0.0;
 		this->internalState.INIT_X = 0.0;
 		this->internalState.INIT_W = 0.0;
 		this->internalState.INIT_F = 0.0;
-		this->internalState.stored__torque = this->internalState.INIT_TORQUE;
 		this->internalState.stored__psu = this->internalState.INIT_PSU;
 		this->internalState.stored__x = this->internalState.INIT_X;
 		this->internalState.stored__v = this->internalState.INIT_V;
+		this->internalState.stored__torque = this->internalState.INIT_TORQUE;
 		this->internalState.stored__w = this->internalState.INIT_W;
 		this->internalState.stored__f = this->internalState.INIT_F;
 	}
@@ -168,23 +168,23 @@ namespace adaptation
 			printf("Invoking void PlantMultiRate::in_rule_body1(double dt, double H, double h)");
 			printf("\n");
 		#endif	
+		this->internalState.stored__torque = this->internalState.torque;
 		this->internalState.stored__v = this->internalState.v;
 		this->internalState.stored__x = this->internalState.x;
 		this->internalState.stored__psu = this->internalState.psu;
-		this->internalState.stored__torque = this->internalState.torque;
 	}
 	void PlantMultiRate::in_rule_flush1(double dt, double H, double h){
 		#ifdef SA_DEBUG
 			printf("Invoking void PlantMultiRate::in_rule_flush1(double dt, double H, double h)");
 			printf("\n");
 		#endif	
-		setValue(plant,PLANTTORQUE,this->internalState.stored__torque);
+		setValue(plant,PLANTV,this->internalState.stored__v);
 		;
 		setValue(plant,PLANTPSU,this->internalState.stored__psu);
 		;
-		setValue(plant,PLANTV,this->internalState.stored__v);
-		;
 		setValue(plant,PLANTX,this->internalState.stored__x);
+		;
+		setValue(plant,PLANTTORQUE,this->internalState.stored__torque);
 		;
 	}
 	shared_ptr<list<Rule<PlantMultiRate>>> PlantMultiRate::createInputRules()
@@ -233,16 +233,16 @@ namespace adaptation
 			printf("Invoking void PlantMultiRate::out_rule_body1(double dt, double H, double h)");
 			printf("\n");
 		#endif	
-		this->internalState.stored__f = getValueDouble(plant,PLANTF);
 		this->internalState.stored__w = getValueDouble(plant,PLANTW);
+		this->internalState.stored__f = getValueDouble(plant,PLANTF);
 	}
 	void PlantMultiRate::out_rule_flush1(double dt, double H, double h){
 		#ifdef SA_DEBUG
 			printf("Invoking void PlantMultiRate::out_rule_flush1(double dt, double H, double h)");
 			printf("\n");
 		#endif	
-		this->internalState.f = this->internalState.stored__f;
 		this->internalState.w = this->internalState.stored__w;
+		this->internalState.f = this->internalState.stored__f;
 	}
 	shared_ptr<list<Rule<PlantMultiRate>>> PlantMultiRate::createOutputRules()
 	{

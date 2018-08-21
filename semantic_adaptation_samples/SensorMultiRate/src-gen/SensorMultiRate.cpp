@@ -11,9 +11,9 @@ namespace adaptation
 		this->internalState.INIT_V = 0.0;
 		this->internalState.INIT_X = 0.0;
 		this->internalState.stored__f = this->internalState.INIT_F;
+		this->internalState.stored__x_aft = this->internalState.INIT_X_AFT;
 		this->internalState.stored__v = this->internalState.INIT_V;
 		this->internalState.stored__x = this->internalState.INIT_X;
-		this->internalState.stored__x_aft = this->internalState.INIT_X_AFT;
 	}
 	
 	void SensorMultiRate::initialize(bool loggingOn)
@@ -206,18 +206,18 @@ namespace adaptation
 			printf("Invoking void SensorMultiRate::out_rule_body1(double dt, double H, double h)");
 			printf("\n");
 		#endif	
-		this->internalState.stored__x = getValueDouble(sensor,SENSORX);
 		this->internalState.stored__v = getValueDouble(sensor,SENSORV);
 		this->internalState.stored__x_aft = getValueDouble(sensor,SENSORX_AFT);
+		this->internalState.stored__x = getValueDouble(sensor,SENSORX);
 	}
 	void SensorMultiRate::out_rule_flush1(double dt, double H, double h){
 		#ifdef SA_DEBUG
 			printf("Invoking void SensorMultiRate::out_rule_flush1(double dt, double H, double h)");
 			printf("\n");
 		#endif	
-		this->internalState.x = this->internalState.stored__x;
 		this->internalState.v = this->internalState.stored__v;
 		this->internalState.x_aft = this->internalState.stored__x_aft;
+		this->internalState.x = this->internalState.stored__x;
 	}
 	shared_ptr<list<Rule<SensorMultiRate>>> SensorMultiRate::createOutputRules()
 	{

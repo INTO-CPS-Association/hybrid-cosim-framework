@@ -43,11 +43,11 @@ control rules {
 true -> {
 stored__f := SensorMultiRate . f ; } --> {
 sensor . f := stored__f ; } ; }
-out var Real stored__v := INIT_V , Real stored__x := INIT_X , Real stored__x_aft := INIT_X_AFT ; out rules {
+out var Real stored__x_aft := INIT_X_AFT , Real stored__v := INIT_V , Real stored__x := INIT_X ; out rules {
 true -> {
-stored__x := sensor . x ;
 stored__v := sensor . v ;
-stored__x_aft := sensor . x_aft ; } --> {
-SensorMultiRate . x := stored__x ;
+stored__x_aft := sensor . x_aft ;
+stored__x := sensor . x ; } --> {
 SensorMultiRate . v := stored__v ;
-SensorMultiRate . x_aft := stored__x_aft ; } ; }
+SensorMultiRate . x_aft := stored__x_aft ;
+SensorMultiRate . x := stored__x ; } ; }

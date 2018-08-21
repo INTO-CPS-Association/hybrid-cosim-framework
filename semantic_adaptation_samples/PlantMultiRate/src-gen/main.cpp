@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
 			fmi2Instantiate("this system", fmi2CoSimulation, "{1234}",
 					"D:\\srcctrl\\into-cps-organization\\hybridCosimulation-framework\\semantic_adaptation_samples\\PlantMultiRate",
 					&callback, fmi2True,
-					fmi2True); // logging
+					fmi2False); // logging fmi2False
 
 	if (comp == NULL) {
 		cout << "init failed" << endl;
