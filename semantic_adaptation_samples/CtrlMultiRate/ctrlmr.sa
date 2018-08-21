@@ -1,0 +1,59 @@
+semantic adaptation reactive moore CtrlMultiRate
+at "./CtrlMultiRate.fmu"
+
+	for inner fmu Controller ctrl
+		at "./DLoopController_FixedEuler_1Em6.fmu"
+		with input ports 
+			Real v "VEL_FB@expseu_", 
+			Real x "POS_FB@expseu_", 
+			Real ref "REFERENCE@expseu_"
+		with output ports 
+			Real o "OUTPUT@expseu_" 
+
+input ports Real v -> ctrl.v, 
+			Real x -> ctrl.x, 
+			Real ref -> ctrl.ref
+
+param Real RATE := 2.0; 
+
+control var 
+			previous_v := 0.0,
+			previous_x := 0.0;
+			//previous_ref := 0.0;
+
+control rules {
+	var micro_step := 0.0;
+	var inner_time := 0.0;
+	
+	inner_time := t;
+	
+	micro_step := H/RATE;
+	
+	for (var iter in 0 .. RATE) {
+		do_step(ctrl, inner_time, micro_step);
+		inner_time := inner_time + micro_step;	
+	}
+	
+	previous_v := current_v;
+	previous_x := current_x;
+	//previous_ref := current_ref;
+	
+	return H;
+}
+
+in var 
+		//current_ref := 0.0;
+		current_v := 0.0,
+		current_x := 0.0;
+	
+in rules {
+	true -> {
+		//current_ref := ref;
+		current_x := x;
+		current_v := v;
+	} --> {
+		//ctrl.ref := previous_ref + ((current_ref - previous_ref)/H)*dt ;
+		ctrl.x := previous_x + ((current_x - previous_x)/H)*(H + dt + h) ;
+		ctrl.v := previous_v + ((current_v - previous_v)/H)*(H + dt + h) ;
+	};
+}

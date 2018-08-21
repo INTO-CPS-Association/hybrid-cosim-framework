@@ -1,0 +1,69 @@
+semantic adaptation reactive moore CtrlMultiRate
+at "./CtrlMultiRate.fmu"
+
+	for inner fmu Controller ctrl
+		at "./DLoopController_FixedEuler_1Em6.fmu"
+		with input ports 
+			Real v "VEL_FB@expseu_", 
+			Real x "POS_FB@expseu_", 
+			Real ref "REFERENCE@expseu_"
+		with output ports 
+			Real o "OUTPUT@expseu_" 
+
+input ports Real v , 
+			Real x , 
+			Real ref output ports Real o
+
+param Real RATE := 2.0 , Real INIT_V := 0.0 , Real INIT_X := 0.0 , Real INIT_REF := 0.0 , Real INIT_O := 0.0 ; 
+
+control var Real 
+			previous_v := 0.0, Real
+			previous_x := 0.0;
+			//previous_ref := 0.0;
+
+control rules {
+	var Real micro_step := 0.0;
+	var Real inner_time := 0.0;
+	
+	inner_time := t;
+	
+	micro_step := H/RATE;
+	
+	for (var iter in 0 .. RATE) {
+		do_step(ctrl, inner_time, micro_step);
+		inner_time := inner_time + micro_step;	
+	}
+	
+	previous_v := current_v;
+	previous_x := current_x;
+	//previous_ref := current_ref;
+	
+	return H;
+}
+
+in var Real 
+		//current_ref := 0.0;
+		current_v := 0.0, Real
+		current_x := 0.0 , Real stored__x := INIT_X , Real stored__ref := INIT_REF , Real stored__v := INIT_V ;
+	
+in rules {
+	true -> {
+stored__ref := CtrlMultiRate . ref ;
+stored__v := CtrlMultiRate . v ;
+stored__x := CtrlMultiRate . x ;
+		//current_ref := ref;
+		current_x := x;
+		current_v := v;
+	} --> {
+ctrl . v := stored__v ;
+ctrl . ref := stored__ref ;
+ctrl . x := stored__x ;
+		//ctrl.ref := previous_ref + ((current_ref - previous_ref)/H)*dt ;
+		ctrl.x := previous_x + ((current_x - previous_x)/H)*(H + dt + h) ;
+		ctrl.v := previous_v + ((current_v - previous_v)/H)*(H + dt + h) ;
+	};
+}
+out var Real stored__o := INIT_O ; out rules {
+true -> {
+stored__o := ctrl . o ; } --> {
+CtrlMultiRate . o := stored__o ; } ; }
