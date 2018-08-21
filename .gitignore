@@ -20,7 +20,6 @@ CTestTestfile.cmake
 
 #Eclipse
 *.cproject
-*.project
 *.classpath
 *.settings
 
