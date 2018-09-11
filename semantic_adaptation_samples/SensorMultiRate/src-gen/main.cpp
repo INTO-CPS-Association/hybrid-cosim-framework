@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 	fmi2CallbackFunctions callback = { &fmuLoggerCache, NULL, NULL, NULL, NULL };
 	fmi2Component comp =
 			fmi2Instantiate("this system", fmi2CoSimulation, "{1234}",
-					"D:\\srcctrl\\into-cps-organization\\hybridCosimulation-framework\\semantic_adaptation_samples\\SensorMultiRate",
+					"C:\\srcctrl\\into-cps-organization\\hybrid-cosim-framework\\semantic_adaptation_samples\\SensorMultiRate",
 					&callback, fmi2True,
 					fmi2True);
 
