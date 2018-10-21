@@ -1,5 +1,4 @@
 #include "SensorMultiRate.h"
-
 namespace adaptation 
 {
 	SensorMultiRate::SensorMultiRate(shared_ptr<std::string> fmiInstanceName,shared_ptr<string> resourceLocation, const fmi2CallbackFunctions* functions) : 
@@ -13,8 +12,8 @@ namespace adaptation
 		this->internalState.current_f = 0.0;
 		this->internalState.stored__f = this->internalState.INIT_F;
 		this->internalState.stored__v = this->internalState.INIT_V;
-		this->internalState.stored__x = this->internalState.INIT_X;
 		this->internalState.stored__x_aft = this->internalState.INIT_X_AFT;
+		this->internalState.stored__x = this->internalState.INIT_X;
 		this->internalState.previous_f = 0.0;
 	}
 	
@@ -212,8 +211,8 @@ namespace adaptation
 			printf("Invoking void SensorMultiRate::out_rule_body1(double dt, double H, double h)");
 			printf("\n");
 		#endif	
-		this->internalState.stored__x_aft = getValueDouble(sensor,SENSORX_AFT);
 		this->internalState.stored__x = getValueDouble(sensor,SENSORX);
+		this->internalState.stored__x_aft = getValueDouble(sensor,SENSORX_AFT);
 		this->internalState.stored__v = getValueDouble(sensor,SENSORV);
 	}
 	void SensorMultiRate::out_rule_flush1(double dt, double H, double h){
@@ -221,8 +220,8 @@ namespace adaptation
 			printf("Invoking void SensorMultiRate::out_rule_flush1(double dt, double H, double h)");
 			printf("\n");
 		#endif	
-		this->internalState.x_aft = this->internalState.stored__x_aft;
 		this->internalState.x = this->internalState.stored__x;
+		this->internalState.x_aft = this->internalState.stored__x_aft;
 		this->internalState.v = this->internalState.stored__v;
 	}
 	shared_ptr<list<Rule<SensorMultiRate>>> SensorMultiRate::createOutputRules()

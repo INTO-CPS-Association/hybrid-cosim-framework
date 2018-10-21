@@ -18,7 +18,7 @@ input ports Real torque ,
 			Real x , Real psu
 output ports Real w , Real f
 
-param Real RATE := 2.0 , Real INIT_TORQUE := 0.0 , Real INIT_V := 0.0 , Real INIT_X := 0.0 , Real INIT_PSU := 0.0 , Real INIT_W := 0.0 , Real INIT_F := 0.0 ;
+param Real RATE := 10.0 , Real INIT_TORQUE := 0.0 , Real INIT_V := 0.0 , Real INIT_X := 0.0 , Real INIT_PSU := 0.0 , Real INIT_W := 0.0 , Real INIT_F := 0.0 ;
 
 control var Real previous_torque := 0.0, Real
 			//previous_psu := 0.0;
@@ -49,22 +49,22 @@ control rules {
 in var Real current_torque := 0.0, Real
 		//current_psu := 0.0;
 		current_v := 0.0, Real
-		current_x := 0.0 , Real stored__x := INIT_X , Real stored__psu := INIT_PSU , Real stored__torque := INIT_TORQUE , Real stored__v := INIT_V ;
+		current_x := 0.0 , Real stored__torque := INIT_TORQUE , Real stored__psu := INIT_PSU , Real stored__v := INIT_V , Real stored__x := INIT_X ;
 in rules {
 	true -> {
-stored__v := PlantMultiRate . v ;
-stored__psu := PlantMultiRate . psu ;
 stored__x := PlantMultiRate . x ;
+stored__psu := PlantMultiRate . psu ;
+stored__v := PlantMultiRate . v ;
 stored__torque := PlantMultiRate . torque ;
 		current_torque := torque;
 		//current_psu := psu;
 		current_x := x;
 		current_v := v;
 	} --> {
+plant . x := stored__x ;
 plant . v := stored__v ;
 plant . psu := stored__psu ;
 plant . torque := stored__torque ;
-plant . x := stored__x ;
 		//plant.torque := previous_torque + ((current_torque - previous_torque)/H)*(dt+h) ;
 		plant.torque := current_torque;
 		//plant.psu := previous_psu + ((current_psu - previous_psu)/H)*dt ;

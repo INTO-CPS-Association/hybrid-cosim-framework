@@ -1,20 +1,19 @@
 #include "CtrlMultiRate.h"
-
 namespace adaptation 
 {
 	CtrlMultiRate::CtrlMultiRate(shared_ptr<std::string> fmiInstanceName,shared_ptr<string> resourceLocation, const fmi2CallbackFunctions* functions) : 
 	SemanticAdaptation(fmiInstanceName, resourceLocation, createInputRules(), createOutputRules(), functions)
 	{			
-		this->internalState.RATE = 2.0;
+		this->internalState.RATE = 10.0;
 		this->internalState.INIT_V = 0.0;
 		this->internalState.INIT_X = 0.0;
 		this->internalState.INIT_REF = 0.0;
 		this->internalState.INIT_O = 0.0;
 		this->internalState.current_v = 0.0;
 		this->internalState.current_x = 0.0;
-		this->internalState.stored__x = this->internalState.INIT_X;
-		this->internalState.stored__ref = this->internalState.INIT_REF;
 		this->internalState.stored__v = this->internalState.INIT_V;
+		this->internalState.stored__ref = this->internalState.INIT_REF;
+		this->internalState.stored__x = this->internalState.INIT_X;
 		this->internalState.stored__o = this->internalState.INIT_O;
 		this->internalState.previous_v = 0.0;
 		this->internalState.previous_x = 0.0;
@@ -158,9 +157,9 @@ namespace adaptation
 			printf("Invoking void CtrlMultiRate::in_rule_body1(double dt, double H, double h)");
 			printf("\n");
 		#endif	
+		this->internalState.stored__x = this->internalState.x;
 		this->internalState.stored__ref = this->internalState.ref;
 		this->internalState.stored__v = this->internalState.v;
-		this->internalState.stored__x = this->internalState.x;
 		this->internalState.current_x = this->internalState.x;
 		this->internalState.current_v = this->internalState.v;
 	}
@@ -169,11 +168,11 @@ namespace adaptation
 			printf("Invoking void CtrlMultiRate::in_rule_flush1(double dt, double H, double h)");
 			printf("\n");
 		#endif	
+		setValue(ctrl,CTRLX,this->internalState.stored__x);
+		;
 		setValue(ctrl,CTRLV,this->internalState.stored__v);
 		;
 		setValue(ctrl,CTRLREF,this->internalState.stored__ref);
-		;
-		setValue(ctrl,CTRLX,this->internalState.stored__x);
 		;
 		setValue(ctrl,CTRLX,this->internalState.previous_x + (((this->internalState.current_x - this->internalState.previous_x) / H) * ((H + dt) + h)));
 		;

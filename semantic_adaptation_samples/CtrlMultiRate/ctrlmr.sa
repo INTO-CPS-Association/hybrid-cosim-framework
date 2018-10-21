@@ -14,7 +14,7 @@ input ports Real v -> ctrl.v,
 			Real x -> ctrl.x, 
 			Real ref -> ctrl.ref
 
-param Real RATE := 2.0; 
+param Real RATE := 10.0; 
 
 control var 
 			previous_v := 0.0,

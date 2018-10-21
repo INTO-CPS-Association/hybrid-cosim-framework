@@ -40,11 +40,11 @@ sensor . f := stored__f ;
 		sensor.f := previous_f + ((current_f - previous_f)/H)*(dt+h);
 	};
 }
-out var Real stored__v := INIT_V , Real stored__x := INIT_X , Real stored__x_aft := INIT_X_AFT ; out rules {
+out var Real stored__x_aft := INIT_X_AFT , Real stored__v := INIT_V , Real stored__x := INIT_X ; out rules {
 true -> {
-stored__x_aft := sensor . x_aft ;
 stored__x := sensor . x ;
+stored__x_aft := sensor . x_aft ;
 stored__v := sensor . v ; } --> {
-SensorMultiRate . x_aft := stored__x_aft ;
 SensorMultiRate . x := stored__x ;
+SensorMultiRate . x_aft := stored__x_aft ;
 SensorMultiRate . v := stored__v ; } ; }

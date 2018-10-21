@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
 		cout << "init failed" << endl;
 		return -1;
 	}
-	
+
 	if (fmi2SetupExperiment(comp, false, 0.0, 0, true, 100) != fmi2OK) {
 		printf("Error fmi2SetupExperiment");
 		return 1;
@@ -72,22 +72,24 @@ int main(int argc, char *argv[]) {
 		printf("Error fmi2SetupExperiment");
 		return 1;
 	}
-	
+
 #define ID_FIN 0
 
 	if (setReal(comp, ID_FIN, 0.0) != fmi2OK) {
 		printf("Error setReal");
 		return 1;
 	}
-	
+
 	if (fmi2ExitInitializationMode(comp) != fmi2OK) {
 		printf("Error fmi2SetupExperiment");
 		return 1;
 	}
 
-#define ID_XOUT 3
-#define ID_VOUT 2
-#define ID_XAFTOUT 1
+#define ID_TORQUEIN 0
+#define ID_PSUIN 1
+
+#define ID_WOUT 3
+#define ID_XAFTOUT 2
 
 	std::fstream fs;
 
@@ -95,22 +97,26 @@ int main(int argc, char *argv[]) {
 	double stepSize = 0.01;
 
 	for (double time = 0.0; time < 2*stepSize; time += stepSize) {
-		
-		if (setReal(comp, ID_FIN, time + stepSize) != fmi2OK) { // 
+
+		if (setReal(comp, ID_TORQUEIN, 0.0) != fmi2OK) { //
 			printf("Error setReal");
 			return 1;
 		}
-		
+
+		if (setReal(comp, ID_PSUIN, 0.0) != fmi2OK) { //
+			printf("Error setReal");
+			return 1;
+		}
+
 		if (fmi2DoStep(comp, time, stepSize, false)!= fmi2OK) {
 			printf("Errorin do step");
 			return 1;
 		}
 
-		auto xout = getReal(comp, ID_XOUT);
-		auto vout = getReal(comp, ID_VOUT);
+		auto wout = getReal(comp, ID_WOUT);
 		auto xaft = getReal(comp, ID_XAFTOUT);
 
-		cout << "time: " << time + stepSize << " x: " << ID_XOUT << " vout: " << vout << " xaft: " << xaft
+		cout << "time: " << time + stepSize << " w: " << wout << " xaft: " << xaft
 				<< endl;
 	}
 
