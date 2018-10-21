@@ -1,3 +1,7 @@
+# Introduction
+
+Please read the ![paper](http://msdl.cs.mcgill.ca/people/claudio/pub/Gomes2018a.pdf) (![bib](http://msdl.cs.mcgill.ca/people/claudio/pub/Gomes2018a.bib)).
+
 # Checkout
 
 ```bash
@@ -24,10 +28,9 @@ make test
 ```
 
 ### Eclipse
-To import into eclipse use eclipse CDT and select 
+To import into eclipse use eclipse CDT and select
 file -> import -> Existing Code as Makefile Project
 
 # Overview
 The image below shows how the components are connected.
 ![C++ Component connections](notes/hybridCosimulation-framework.png)
- 
