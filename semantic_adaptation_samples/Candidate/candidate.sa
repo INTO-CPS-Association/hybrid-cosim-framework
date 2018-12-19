@@ -1,0 +1,39 @@
+semantic adaptation reactive moore Candidate
+at "./SensorMultiRate.fmu"
+
+	for inner fmu CtrlMultiRate ctrl
+		at "./CtrlMultiRate.fmu"
+		with input ports Real v, Real x, Real ref
+		with output ports Real o
+
+	for inner fmu PlantMultiRate plant
+		at "./PlantMultiRate.fmu"
+		with input ports Real torque, Real x, Real v, Real psu
+		with output ports Real w, Real f
+
+	for inner fmu SensorMultiRate sensor
+		at "./SensorMultiRate.fmu"
+		with input ports Real f
+		with output ports Real x_aft, Real v, Real x
+
+	for inner fmu Scenario env
+			at "./Scenario.fmu"
+			with output ports Real psuvolt, ref
+
+	coupled as
+		env.psuvolt -> plant.psu,
+		env.ref -> ctrl.ref,
+		ctrl.o -> plant.torque,
+		plant.w -> ctrl.v,
+		plant.f -> sensor.f,
+		sensor.x -> plant.x,
+		sensor.v -> plant.v,
+		sensor.x_aft -> ctrl.x
+
+control rules {
+	do_step(env, t, H);
+	do_step(ctrl, t, H);
+	do_step(sensor, t, H);
+	do_step(plant, t, H);
+	return H;
+}

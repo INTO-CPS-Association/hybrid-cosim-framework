@@ -1,0 +1,60 @@
+semantic adaptation reactive moore Candidate
+at "./SensorMultiRate.fmu"
+
+	for inner fmu CtrlMultiRate ctrl
+		at "./CtrlMultiRate.fmu"
+		with input ports Real v, Real x, Real ref
+		with output ports Real o
+
+	for inner fmu PlantMultiRate plant
+		at "./PlantMultiRate.fmu"
+		with input ports Real torque, Real x, Real v, Real psu
+		with output ports Real w, Real f
+
+	for inner fmu SensorMultiRate sensor
+		at "./SensorMultiRate.fmu"
+		with input ports Real f
+		with output ports Real x_aft, Real v, Real x
+
+	for inner fmu Scenario env
+			at "./Scenario.fmu"
+			with output ports Real psuvolt, Real ref
+
+	coupled as
+		env.psuvolt -> plant.psu,
+		env.ref -> ctrl.ref,
+		ctrl.o -> plant.torque,
+		plant.w -> ctrl.v,
+		plant.f -> sensor.f,
+		sensor.x -> plant.x,
+		sensor.v -> plant.v,
+		sensor.x_aft -> ctrl.x
+param Real INIT_O := 0.0 , Real INIT_W := 0.0 , Real INIT_F := 0.0 , Real INIT_X_AFT := 0.0 , Real INIT_V := 0.0 , Real INIT_X := 0.0 , Real INIT_PSUVOLT := 0.0 , Real INIT_REF := 0.0 ;
+
+control rules {
+	do_step(env, t, H);
+ctrl . ref := stored__ref ;
+ctrl . v := stored__w ;
+ctrl . x := stored__x_aft ;
+	do_step(ctrl, t, H);
+sensor . f := stored__f ;
+	do_step(sensor, t, H);
+plant . psu := stored__psuvolt ;
+plant . torque := stored__o ;
+plant . x := stored__x ;
+plant . v := stored__v ;
+	do_step(plant, t, H);
+	return H;
+}
+in rules {
+true -> { } --> { } ; }
+out var Real stored__o := INIT_O , Real stored__v := INIT_V , Real stored__ref := INIT_REF , Real stored__x := INIT_X , Real stored__f := INIT_F , Real stored__psuvolt := INIT_PSUVOLT , Real stored__w := INIT_W , Real stored__x_aft := INIT_X_AFT ; out rules {
+true -> {
+stored__x_aft := sensor . x_aft ;
+stored__w := plant . w ;
+stored__psuvolt := env . psuvolt ;
+stored__f := plant . f ;
+stored__x := sensor . x ;
+stored__ref := env . ref ;
+stored__v := sensor . v ;
+stored__o := ctrl . o ; } --> { } ; }

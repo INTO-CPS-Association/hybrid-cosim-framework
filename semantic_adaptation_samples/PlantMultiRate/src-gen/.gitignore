@@ -1,0 +1,7 @@
+/CMakeLists.txt
+/Fmu.cpp
+/PlantMultiRate.cpp
+/PlantMultiRate.h
+/modelDescription.xml
+/msys-toolchain.cmake
+/plantmr_canonical.sa

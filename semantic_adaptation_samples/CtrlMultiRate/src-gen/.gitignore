@@ -1,0 +1,7 @@
+/ctrlmr_canonical.sa
+/CMakeLists.txt
+/CtrlMultiRate.cpp
+/CtrlMultiRate.h
+/Fmu.cpp
+/modelDescription.xml
+/msys-toolchain.cmake
