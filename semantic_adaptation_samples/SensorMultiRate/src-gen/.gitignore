@@ -4,3 +4,5 @@
 /SensorMultiRate.h
 /modelDescription.xml
 /sensormr_canonical.sa
+/CMakeLists.txt
+/msys-toolchain.cmake

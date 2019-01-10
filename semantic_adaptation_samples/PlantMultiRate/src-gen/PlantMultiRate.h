@@ -88,10 +88,10 @@ namespace adaptation
 				double current_torque;
 				double current_v;
 				double current_x;
-				double stored__torque;
-				double stored__psu;
-				double stored__v;
 				double stored__x;
+				double stored__psu;
+				double stored__torque;
+				double stored__v;
 				double stored__w;
 				double stored__f;
 				double previous_torque;

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><fmiModelDescription copyright="Aarhus University and University of Antwerpen" fmiVersion="2.0" generationTool="BaseSA" guid="4f352424-4ed0-4ab1-a6c5-512f55ec2580" license="MIT" modelName="SensorMultiRate" numberOfEventIndicators="0" variableNamingConvention="flat">
+<?xml version="1.0" encoding="UTF-8"?><fmiModelDescription copyright="Aarhus University and University of Antwerpen" fmiVersion="2.0" generationTool="BaseSA" guid="1f147def-4ac6-43c4-8563-33163e890bf4" license="MIT" modelName="SensorMultiRate" numberOfEventIndicators="0" variableNamingConvention="flat">
     <CoSimulation canBeInstantiatedOnlyOncePerProcess="true" canGetAndSetFMUstate="true" canHandleVariableCommunicationStepSize="true" canInterpolateInputs="true" canNotUseMemoryManagementFunctions="true" canRunAsynchronuously="false" canSerializeFMUstate="false" maxOutputDerivativeOrder="0" modelIdentifier="SensorMultiRate" needsExecutionTool="false" providesDirectionalDerivative="false"/>
     <LogCategories>
         <Category name="logAll"/>

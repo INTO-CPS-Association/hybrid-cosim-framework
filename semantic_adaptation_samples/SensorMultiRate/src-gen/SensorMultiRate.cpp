@@ -212,8 +212,8 @@ namespace adaptation
 			printf("\n");
 		#endif	
 		this->internalState.stored__x = getValueDouble(sensor,SENSORX);
-		this->internalState.stored__x_aft = getValueDouble(sensor,SENSORX_AFT);
 		this->internalState.stored__v = getValueDouble(sensor,SENSORV);
+		this->internalState.stored__x_aft = getValueDouble(sensor,SENSORX_AFT);
 	}
 	void SensorMultiRate::out_rule_flush1(double dt, double H, double h){
 		#ifdef SA_DEBUG
@@ -221,8 +221,8 @@ namespace adaptation
 			printf("\n");
 		#endif	
 		this->internalState.x = this->internalState.stored__x;
-		this->internalState.x_aft = this->internalState.stored__x_aft;
 		this->internalState.v = this->internalState.stored__v;
+		this->internalState.x_aft = this->internalState.stored__x_aft;
 	}
 	shared_ptr<list<Rule<SensorMultiRate>>> SensorMultiRate::createOutputRules()
 	{

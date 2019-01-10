@@ -44,16 +44,16 @@ control rules {
 }
 in var Real stored__psu := INIT_PSU , Real stored__torque := INIT_TORQUE ; in rules {
 true -> {
-stored__psu := SensorPlantMultiRate . psu ;
-stored__torque := SensorPlantMultiRate . torque ; } --> {
+stored__torque := SensorPlantMultiRate . torque ;
+stored__psu := SensorPlantMultiRate . psu ; } --> {
 plant . psu := stored__psu ;
 plant . torque := stored__torque ; } ; }
-out var Real stored__v := INIT_V , Real stored__w := INIT_W , Real stored__x_aft := INIT_X_AFT , Real stored__f := INIT_F , Real stored__x := INIT_X ; out rules {
+out var Real stored__f := INIT_F , Real stored__v := INIT_V , Real stored__x := INIT_X , Real stored__w := INIT_W , Real stored__x_aft := INIT_X_AFT ; out rules {
 true -> {
-stored__v := sensor . v ;
-stored__x := sensor . x ;
-stored__f := plant . f ;
 stored__x_aft := sensor . x_aft ;
-stored__w := plant . w ; } --> {
+stored__w := plant . w ;
+stored__x := sensor . x ;
+stored__v := sensor . v ;
+stored__f := plant . f ; } --> {
 SensorPlantMultiRate . x_aft := stored__x_aft ;
 SensorPlantMultiRate . w := stored__w ; } ; }

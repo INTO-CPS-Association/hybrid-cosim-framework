@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><fmiModelDescription copyright="Aarhus University and University of Antwerpen" fmiVersion="2.0" generationTool="BaseSA" guid="bb836d9b-cd39-4ccb-8899-9d1c47c7d561" license="MIT" modelName="CtrlMultiRate" numberOfEventIndicators="0" variableNamingConvention="flat">
-    <CoSimulation canBeInstantiatedOnlyOncePerProcess="true" canGetAndSetFMUstate="true" canHandleVariableCommunicationStepSize="true" canInterpolateInputs="true" canNotUseMemoryManagementFunctions="true" canRunAsynchronuously="false" canSerializeFMUstate="false" maxOutputDerivativeOrder="0" modelIdentifier="CtrlMultiRate" needsExecutionTool="false" providesDirectionalDerivative="false"/>
+<?xml version="1.0" encoding="UTF-8"?><fmiModelDescription copyright="Aarhus University and University of Antwerpen" fmiVersion="2.0" generationTool="BaseSA" guid="bb836d9b-cd39-4ccb-8899-9d1c47c7d561" license="MIT" modelName="CtrlProactive" numberOfEventIndicators="0" variableNamingConvention="flat">
+    <CoSimulation canBeInstantiatedOnlyOncePerProcess="true" canGetAndSetFMUstate="true" canHandleVariableCommunicationStepSize="true" canInterpolateInputs="true" canNotUseMemoryManagementFunctions="true" canRunAsynchronuously="false" canSerializeFMUstate="false" maxOutputDerivativeOrder="0" modelIdentifier="CtrlProactive" needsExecutionTool="false" providesDirectionalDerivative="false"/>
     <LogCategories>
         <Category name="logAll"/>
         <Category name="logError"/>

@@ -79,8 +79,8 @@ namespace adaptation
 				double current_v;
 				double current_x;
 				double stored__v;
-				double stored__ref;
 				double stored__x;
+				double stored__ref;
 				double stored__o;
 				double previous_v;
 				double previous_x;

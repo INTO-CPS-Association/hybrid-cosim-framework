@@ -1,1 +1,7 @@
 /sensorplantmr_canonical.sa
+/CMakeLists.txt
+/Fmu.cpp
+/SensorPlantMultiRate.cpp
+/SensorPlantMultiRate.h
+/modelDescription.xml
+/msys-toolchain.cmake

@@ -44,20 +44,20 @@ control rules {
 in var Real 
 		//current_ref := 0.0;
 		current_v := 0.0, Real
-		current_x := 0.0 , Real stored__v := INIT_V , Real stored__ref := INIT_REF , Real stored__x := INIT_X ;
+		current_x := 0.0 , Real stored__v := INIT_V , Real stored__x := INIT_X , Real stored__ref := INIT_REF ;
 	
 in rules {
 	true -> {
-stored__x := CtrlMultiRate . x ;
 stored__ref := CtrlMultiRate . ref ;
+stored__x := CtrlMultiRate . x ;
 stored__v := CtrlMultiRate . v ;
 		//current_ref := ref;
 		current_x := x;
 		current_v := v;
 	} --> {
-ctrl . x := stored__x ;
-ctrl . v := stored__v ;
 ctrl . ref := stored__ref ;
+ctrl . v := stored__v ;
+ctrl . x := stored__x ;
 		//ctrl.ref := previous_ref + ((current_ref - previous_ref)/H)*dt ;
 		ctrl.x := previous_x + ((current_x - previous_x)/H)*(H + dt + h) ;
 		ctrl.v := previous_v + ((current_v - previous_v)/H)*(H + dt + h) ;

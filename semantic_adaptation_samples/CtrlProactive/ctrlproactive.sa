@@ -1,0 +1,40 @@
+semantic adaptation reactive moore CtrlProactive
+at "./CtrlProactive.fmu"
+
+	for inner fmu Controller ctrl
+		at "./DLoopController_FixedEuler_1Em6.fmu"
+		with input ports 
+			Real v "VEL_FB@expseu_", 
+			Real x "POS_FB@expseu_", 
+			Real ref "REFERENCE@expseu_"
+		with output ports 
+			Real o "OUTPUT@expseu_" 
+
+input ports Real v -> ctrl.v, 
+			Real x -> ctrl.x, 
+			Real ref -> ctrl.ref
+
+control var 
+			previous_v := 0.0,
+			previous_x := 0.0;
+
+control rules {
+	do_step(ctrl, t, H);
+	previous_v := current_v;
+	previous_x := current_x;
+	return H;
+}
+
+in var 
+		current_v := 0.0,
+		current_x := 0.0;
+	
+in rules {
+	true -> {
+		current_x := x;
+		current_v := v;
+	} --> {
+		ctrl.x := current_x + (current_x - previous_x);
+		ctrl.v := current_v + (current_v - previous_v);
+	};
+}

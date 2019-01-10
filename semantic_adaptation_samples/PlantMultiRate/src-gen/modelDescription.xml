@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><fmiModelDescription copyright="Aarhus University and University of Antwerpen" fmiVersion="2.0" generationTool="BaseSA" guid="cada1714-839a-4236-9a13-271eda6217ff" license="MIT" modelName="PlantMultiRate" numberOfEventIndicators="0" variableNamingConvention="flat">
+<?xml version="1.0" encoding="UTF-8"?><fmiModelDescription copyright="Aarhus University and University of Antwerpen" fmiVersion="2.0" generationTool="BaseSA" guid="a26d97a8-f6a3-4cb2-a461-2e3a6d7bfbfe" license="MIT" modelName="PlantMultiRate" numberOfEventIndicators="0" variableNamingConvention="flat">
     <CoSimulation canBeInstantiatedOnlyOncePerProcess="true" canGetAndSetFMUstate="true" canHandleVariableCommunicationStepSize="true" canInterpolateInputs="true" canNotUseMemoryManagementFunctions="true" canRunAsynchronuously="false" canSerializeFMUstate="false" maxOutputDerivativeOrder="0" modelIdentifier="PlantMultiRate" needsExecutionTool="false" providesDirectionalDerivative="false"/>
     <LogCategories>
         <Category name="logAll"/>

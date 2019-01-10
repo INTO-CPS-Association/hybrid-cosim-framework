@@ -48,13 +48,13 @@ plant . v := stored__v ;
 }
 in rules {
 true -> { } --> { } ; }
-out var Real stored__o := INIT_O , Real stored__v := INIT_V , Real stored__ref := INIT_REF , Real stored__x := INIT_X , Real stored__f := INIT_F , Real stored__psuvolt := INIT_PSUVOLT , Real stored__w := INIT_W , Real stored__x_aft := INIT_X_AFT ; out rules {
+out var Real stored__o := INIT_O , Real stored__x_aft := INIT_X_AFT , Real stored__v := INIT_V , Real stored__psuvolt := INIT_PSUVOLT , Real stored__f := INIT_F , Real stored__ref := INIT_REF , Real stored__w := INIT_W , Real stored__x := INIT_X ; out rules {
 true -> {
-stored__x_aft := sensor . x_aft ;
-stored__w := plant . w ;
-stored__psuvolt := env . psuvolt ;
-stored__f := plant . f ;
 stored__x := sensor . x ;
+stored__w := plant . w ;
 stored__ref := env . ref ;
+stored__f := plant . f ;
+stored__psuvolt := env . psuvolt ;
 stored__v := sensor . v ;
+stored__x_aft := sensor . x_aft ;
 stored__o := ctrl . o ; } --> { } ; }
