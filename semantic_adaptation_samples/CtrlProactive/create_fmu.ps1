@@ -22,7 +22,7 @@ createEmptyDir("$FMU_DIR/resources")
 copy src-gen/*.cpp $FMU_DIR/sources
 copy src-gen/*.h $FMU_DIR/sources
 
-copy "lib$FMU_DIR.dll" $FMU_DIR/binaries/win64/CtrlMultiRate.dll
+copy "lib$FMU_DIR.dll" $FMU_DIR/binaries/win64/$FMU_DIR.dll
 copy C:\msys64\mingw64\bin\libwinpthread-1.dll $FMU_DIR/binaries/win64/
 
 copy src-gen/modelDescription.xml $FMU_DIR/
